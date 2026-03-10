@@ -107,7 +107,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|Win32'">
@@ -121,7 +121,7 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
-    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnabled>false</VcpkgEnabled>
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
     <VcpkgXUseBuiltInApplocalDeps>true</VcpkgXUseBuiltInApplocalDeps>
   </PropertyGroup>
@@ -215,10 +215,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
-      <OutputFile>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutputFile>
+      <OutputFile>$(SolutionDir)bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <BuildLog>
-      <Path>$(SolutionDir)bin\$(Platform)\$(Configuration)\</Path>
+      <Path>
+      </Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='x64|Win32'">
@@ -266,7 +267,6 @@
     <ClCompile Include="hash.cpp" />
     <ClCompile Include="module_list.cpp" />
     <ClCompile Include="pepd.cpp" />
-    <ClCompile Include="pe_exports.cpp" />
     <ClCompile Include="pe_hash_database.cpp" />
     <ClCompile Include="pe_header.cpp" />
     <ClCompile Include="pe_imports.cpp" />
@@ -276,12 +276,10 @@
   <ItemGroup>
     <ClInclude Include="close_watcher.h" />
     <ClInclude Include="dump_process.h" />
-    <ClInclude Include="DynArray.h" />
     <ClInclude Include="export_list.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="module_list.h" />
     <ClInclude Include="nmd_assembly.h" />
-    <ClInclude Include="pe_exports.h" />
     <ClInclude Include="pe_hash_database.h" />
     <ClInclude Include="pe_header.h">
       <FileType>CppCode</FileType>
@@ -296,10 +294,9 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="terminate_monitor_hook.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="work_queue.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="pd.rc" />
+    <ResourceCompile Include="pepd.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

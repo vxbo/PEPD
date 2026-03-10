@@ -1,7 +1,6 @@
-#include "StdAfx.h"
 #include "pe_header.h"
 
-pe_header::pe_header( char* filename, PD_OPTIONS* options )
+pe_header::pe_header( const char* filename, PEPD_OPTIONS* options )
 {
 	this->_options = options;
 	this->_image_size = 0;
@@ -55,7 +54,7 @@ export_list* pe_header::get_exports()
 	return NULL;
 }
 
-pe_header::pe_header( DWORD pid, void* base, module_list* modules, PD_OPTIONS* options )
+pe_header::pe_header( DWORD pid, void* base, module_list* modules, PEPD_OPTIONS* options )
 {
 	this->_options = options;
 	this->_image_size = 0;
@@ -103,7 +102,7 @@ pe_header::pe_header( DWORD pid, void* base, module_list* modules, PD_OPTIONS* o
 		fprintf( stdout, "INFO: Initialized header for module name %s.\n", this->get_name() );
 }
 
-pe_header::pe_header( DWORD pid, module_list* modules, PD_OPTIONS* options )
+pe_header::pe_header( DWORD pid, module_list* modules, PEPD_OPTIONS* options )
 {
 	this->_options = options;
 	this->_image_size = 0;
@@ -142,7 +141,7 @@ pe_header::pe_header( DWORD pid, module_list* modules, PD_OPTIONS* options )
 		fprintf( stdout, "INFO: Initialized header for module name %s.\n", this->get_name() );
 }
 
-pe_header::pe_header( HANDLE ph, void* base, module_list* modules, PD_OPTIONS* options )
+pe_header::pe_header( HANDLE ph, void* base, module_list* modules, PEPD_OPTIONS* options )
 {
 	this->_options = options;
 	this->_image_size = 0;
@@ -230,7 +229,7 @@ bool pe_header::is_64()
 	return this->_parsed_pe_64;
 }
 
-void pe_header::set_name(char* new_name)
+void pe_header::set_name(const char* new_name)
 {
 	// Set name to sue for this module
 	if( _name_filepath_short != NULL )
@@ -242,7 +241,7 @@ void pe_header::set_name(char* new_name)
 	_name_filepath_short_size = strlen(_name_filepath_short);
 }
 
-char* pe_header::get_name()
+const char* pe_header::get_name()
 {
 	// Return the name of this module if available.
 	if( this->_name_filepath_short_size > 0 && _name_filepath_short != NULL )

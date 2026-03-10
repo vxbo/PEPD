@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "export_list.h"
 
 
@@ -117,7 +116,7 @@ bool export_list::contains(unsigned __int32 address)
 	return false;
 }
 
-unsigned __int64 export_list::find_export(char* library, char* name, bool is64)
+unsigned __int64 export_list::find_export(const char* library, const char* name, bool is64)
 {
 	// Find the specified procedure in the corresponding library. Limit it to the specific 32-bit or 64-bit version of the library.
 	for (unordered_map<unsigned __int64, export_entry*>::iterator it = _address_to_exports.begin(); it != _address_to_exports.end(); ++it)

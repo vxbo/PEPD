@@ -1,22 +1,21 @@
-#include "StdAfx.h"
 #include "pe_imports.h"
 
 void pe_imports::add_fixup(char* library_name, int ordinal, __int64 rva, bool win64)
 {
-	this->_libraries.Add(new import_library(library_name, ordinal, rva, win64));
+	this->_libraries.push_back(new import_library(library_name, ordinal, rva, win64));
 }
 
 void pe_imports::add_fixup(char* library_name, char* proc_name, __int64 rva, bool win64)
 {
-	this->_libraries.Add(new import_library(library_name, proc_name, rva, win64));
+	this->_libraries.push_back(new import_library(library_name, proc_name, rva, win64));
 }
 
 
 void pe_imports::get_table_size(__int64 &descriptor_size, __int64 &extra_size)
 {
-	for( int i = 0; i < _libraries.GetSize(); i++ )
+	for( size_t i = 0; i < _libraries.size(); i++ )
 	{
-		_libraries[i]->get_table_size( descriptor_size, extra_size );
+		_libraries.at(i)->get_table_size(descriptor_size, extra_size);
 	}
 	descriptor_size += sizeof(IMAGE_IMPORT_DESCRIPTOR);
 }
@@ -25,9 +24,9 @@ bool pe_imports::build_table(unsigned char* section, __int64 section_size, __int
 {
 	// Build the import table in the new section
 	bool retval = true;
-	for( int i = 0; i < _libraries.GetSize(); i++ )
+	for( size_t i = 0; i < _libraries.size(); i++ )
 	{
-		if( !_libraries[i]->build_table(section, section_size, section_rva, descriptor_offset, extra_offset) )
+		if( !_libraries.at(i)->build_table(section, section_size, section_rva, descriptor_offset, extra_offset) )
 			retval = false;
 	}
 
@@ -68,7 +67,7 @@ pe_imports::pe_imports(unsigned char* image, __int64 image_size, IMAGE_IMPORT_DE
 
 void pe_imports::add_descriptor(IMAGE_IMPORT_DESCRIPTOR* descriptor)
 {
-	this->_libraries.Add( new import_library(descriptor, _win64) );
+	this->_libraries.push_back( new import_library(descriptor, _win64) );
 }
 
 pe_imports::~pe_imports(void)

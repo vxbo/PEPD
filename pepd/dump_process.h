@@ -7,7 +7,6 @@
 #include <tlhelp32.h>
 #include "simple.h"
 #include "module_list.h"
-#include "DynArray.h"
 #include "export_list.h"
 #include "hash.h"
 #include <set>
@@ -18,8 +17,6 @@
 #define CODECHUNK_NEW_HASH_LIMIT 500 // At most X code chunks processed deeply per process
 
 using namespace std;
-using namespace std::tr1;
-
 
 struct MBI_BASIC_INFO
 {
@@ -39,7 +36,7 @@ class dump_process
 	char* _process_name;
 	export_list _export_list;
 	bool _export_list_built;
-	PD_OPTIONS* _options;
+	PEPD_OPTIONS* _options;
 	terminate_monitor_hook* _term_hook;
 
 	unsigned __int64 _address_main_module = NULL;
@@ -51,13 +48,13 @@ class dump_process
 	MBI_BASIC_INFO get_mbi_info(unsigned __int64 address);
 
 public:
-	dump_process(DWORD pid, pe_hash_database* db, PD_OPTIONS* options, bool quieter);
+	dump_process(DWORD pid, pe_hash_database* db, PEPD_OPTIONS* options, bool quieter);
 	void dump_all();
 	void dump_region(__int64 base);
 	void dump_header(pe_header* header, __int64 base, DWORD pid);
 	DWORD get_pid() { return _pid; };
 	bool build_export_list();
-	bool build_export_list(export_list* result, char* library, module_list* modules);
+	bool build_export_list(export_list* result, const char* library, module_list* modules);
 	int get_all_hashes(unordered_set<unsigned __int64>* output_hashes, unordered_set<unsigned __int64>* output_hashes_eps, unordered_set<unsigned __int64>* output_hashes_ep_shorts);
 	unsigned __int64 hash_codechunk_header(__int64 base);
 	bool is64();

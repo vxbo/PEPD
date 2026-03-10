@@ -8,12 +8,10 @@
 #include <tlhelp32.h>
 #include <Psapi.h>
 #include <regex>
-#include "DynArray.h"
 
 using namespace std;
-using namespace std::tr1;
 
-class PD_OPTIONS
+class PEPD_OPTIONS
 {
 public:
 	bool ImportRec;
@@ -28,11 +26,11 @@ public:
 	__int64 EntryPointOverride;
 	char* output_path;
 
-	PD_OPTIONS()
-	{
-		output_path = new char[1];
-		strcpy(output_path,"");
-	}
+	//PEPD_OPTIONS()
+	//{
+	//	output_path = new char[1];
+	//	strcpy(output_path,"");
+	//}
 
 	void set_output_path( char* path )
 	{
@@ -43,7 +41,7 @@ public:
 		strcpy_s( output_path, strlen(path) + 1, path);
 	}
 
-	~PD_OPTIONS()
+	~PEPD_OPTIONS()
 	{
 		if( output_path != NULL )
 		{
@@ -71,6 +69,6 @@ public:
 	}
 };
 
-DWORD process_find(string match_regex, DynArray<process_description*>* result);
+size_t process_find(string match_regex, std::vector<process_description*>* result);
 string ExePath();
 void PrintLastError(LPTSTR lpszFunction); 

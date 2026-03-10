@@ -1,6 +1,5 @@
 #pragma once
 
-#include "StdAfx.h"
 #include "hash.h"
 #include <stdio.h>
 #include "windows.h"

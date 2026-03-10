@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "pe_hash_database.h"
 
 bool pe_hash_database::_is_mz(FILE* stream)
@@ -57,7 +56,7 @@ pe_hash_database::pe_hash_database(char* clean_database_name, char* ep_database_
 			// Do not continue if the database exists, but we failed to open it. This is to protect
 			// the contents of the database from being overwritten if we save the now empty database
 			// successfully.
-			PrintLastError(L"Failed to open existing hash database. Terminating.");
+			//PrintLastError(L"Failed to open existing hash database. Terminating.");
 			exit(-1);
 		}
 
@@ -88,7 +87,7 @@ pe_hash_database::pe_hash_database(char* clean_database_name, char* ep_database_
 			// Do not continue if the database exists, but we failed to open it. This is to protect
 			// the contents of the database from being overwritten if we save the now empty database
 			// successfully.
-			PrintLastError(L"Failed to open existing entrypoint hash database. Terminating.");
+			//PrintLastError(L"Failed to open existing entrypoint hash database. Terminating.");
 			exit(-1);
 		}
 
@@ -120,7 +119,7 @@ pe_hash_database::pe_hash_database(char* clean_database_name, char* ep_database_
 			// Do not continue if the database exists, but we failed to open it. This is to protect
 			// the contents of the database from being overwritten if we save the now empty database
 			// successfully.
-			PrintLastError(L"Failed to open existing entrypoint short hash database. Terminating.");
+			//PrintLastError(L"Failed to open existing entrypoint short hash database. Terminating.");
 			exit(-1);
 		}
 
@@ -208,7 +207,7 @@ bool pe_hash_database::add_hashes_eps(unordered_set<unsigned __int64> hashes, un
 }
 	
 
-bool pe_hash_database::add_folder( char* dir_name, WCHAR* filter, bool recursively )
+bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool recursively )
 {
 	// Expand the environment names in the directory
 	char dir_name_expanded[PATH_MAX + 1];
@@ -396,7 +395,7 @@ bool pe_hash_database::contains_epshort(unsigned __int64 hash)
 
 bool pe_hash_database::add_file(char* file)
 {
-	PD_OPTIONS options;
+	PEPD_OPTIONS options;
 	options.ForceGenHeader = false;
 	options.ImportRec = false;
 	options.Verbose = false;
@@ -467,7 +466,7 @@ bool pe_hash_database::add_file(char* file)
 
 bool pe_hash_database::remove_file(char* file)
 {
-	PD_OPTIONS options;
+	PEPD_OPTIONS options;
 	options.ForceGenHeader = false;
 	options.ImportRec = false;
 	options.Verbose = false;
@@ -521,7 +520,7 @@ bool pe_hash_database::save()
 	}
 	else
 	{
-		PrintLastError(L"Failed to open existing entrypoint database..");
+		//PrintLastError(L"Failed to open existing entrypoint database..");
 	}
 
 	// Save the short entrypoint database
@@ -543,7 +542,7 @@ bool pe_hash_database::save()
 	}
 	else
 	{
-		PrintLastError(L"Failed to open existing entrypoint short hash database..");
+		//PrintLastError(L"Failed to open existing entrypoint short hash database..");
 	}
 
 	// Open and read in the database of clean hashes if it exists.
@@ -566,7 +565,7 @@ bool pe_hash_database::save()
 	}
 	else
 	{
-		PrintLastError(L"Failed to open existing clean hash database..");
+		//PrintLastError(L"Failed to open existing clean hash database..");
 	}
 
 	

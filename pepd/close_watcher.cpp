@@ -1,8 +1,7 @@
-#include "stdafx.h"
 #include "close_watcher.h"
 
 
-close_watcher::close_watcher(pe_hash_database* clean_db, PD_OPTIONS* options)
+close_watcher::close_watcher(pe_hash_database* clean_db, PEPD_OPTIONS* options)
 {
 	_clean_db = clean_db;
 	_options = options;
@@ -106,7 +105,7 @@ void close_watcher::_monitor_dump_on_close()
 				char name[0x200];
 				it->second->get_process_name(name, sizeof(name));
 				printf("Process %s requesting to close, we are dumping it...\n", name);
-				_work_queue.push(it->second); // Will be freed when it gets processed from work queue
+				_work_queue.push_back(it->second); // Will be freed when it gets processed from work queue
 
 				// Remove this process
 				it = hooked_processes.erase(it);
@@ -151,8 +150,8 @@ void close_watcher::_dump_process_worker_and_close()
 	while (!_monitor_request_stop || !_work_queue.empty())
 	{
 		// Process the hashes for this process
-		dump_process* entry;
-		if (_work_queue.pop(entry))
+		dump_process* entry = nullptr;
+		if (_work_queue.remove(entry))
 		{
 			// Process this process
 

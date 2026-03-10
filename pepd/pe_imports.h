@@ -1,10 +1,10 @@
 #pragma once
 #include "windows.h"
-#include "DynArray.h"
+#include <vector>
 #include "utils.h"
 
-#define IMAGE_ORDINAL_FLAG64 0x8000000000000000ULL
-#define IMAGE_ORDINAL_FLAG32 0x80000000
+//#define IMAGE_ORDINAL_FLAG64 0x8000000000000000ULL
+//#define IMAGE_ORDINAL_FLAG32 0x80000000
 
 class import_library
 {
@@ -22,14 +22,15 @@ public:
 
 	bool build_table(unsigned char* section, __int64 section_size, __int64 section_rva, __int64 &descriptor_offset, __int64 &extra_offset);
 	void get_table_size(__int64 &descriptor_size, __int64 &extra_size);
-	char* GetName();
+	// stub
+	/*char* GetName();*/
 	~import_library(void);
 };
 
 class pe_imports
 {
 	bool _win64;
-	DynArray<import_library*> _libraries;
+	std::vector<import_library*> _libraries;
 public:
 	pe_imports(unsigned char* image, __int64 image_size, IMAGE_IMPORT_DESCRIPTOR* imports, bool win64);
 	void add_descriptor(IMAGE_IMPORT_DESCRIPTOR* descriptor);

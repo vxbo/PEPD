@@ -1,10 +1,6 @@
-#include "StdAfx.h"
 #include "dump_process.h"
 
-
-
-
-dump_process::dump_process(DWORD pid, pe_hash_database* db, PD_OPTIONS* options, bool quieter)
+dump_process::dump_process(DWORD pid, pe_hash_database* db, PEPD_OPTIONS* options, bool quieter)
 {
 	_options = options;
 	_opened = false;
@@ -68,8 +64,8 @@ dump_process::dump_process(DWORD pid, pe_hash_database* db, PD_OPTIONS* options,
 			{
 				if (GetLastError() == 299)
 					fprintf(stderr, "ERROR: Unable to snapshot process PID 0x%x. This can be as a result of the process being a 64 bit process and this tool is running as a 32 bit process, or the process may have not finished being created or already closed.\n", pid);
-				else
-					PrintLastError(L"dump_process CreateToolhelp32Snapshot");
+				/*else
+					PrintLastError(L"dump_process CreateToolhelp32Snapshot");*/
 			}
 
 			_process_name = new char[strlen("unknown")+1];
@@ -81,7 +77,7 @@ dump_process::dump_process(DWORD pid, pe_hash_database* db, PD_OPTIONS* options,
 		if (!_quieter)
 		{
 			fprintf(stderr, "Failed to open process with PID 0x%x:\n", pid);
-			PrintLastError(L"\tdump_process");
+			/*PrintLastError(L"\tdump_process");*/
 		}
 	}
 }
@@ -422,7 +418,7 @@ bool dump_process::build_export_list()
 	return true;
 }
 
-bool dump_process::build_export_list(export_list* result, char* library, module_list* modules)
+bool dump_process::build_export_list(export_list* result, const char* library, module_list* modules)
 {
 	// Walk through each module, building the export list for this process. This will be used for import reconstruction
 	// Returns: True if there are any modules to dump, False if there is nothing to dump.
@@ -467,7 +463,7 @@ void dump_process::dump_header(pe_header* header, __int64 base, DWORD pid)
 					if( header->process_disk_image(&this->_export_list, this->_db_clean ) )
 					{
 						// Build the name that we will dump this image as
-						char* extension = ( header->is_exe() ? "exe" :
+						const char* extension = ( header->is_exe() ? "exe" :
 														( header->is_dll() ? "dll" : 
 														( header->is_sys() ? "sys" : "bin" ) ) );
 						int length = MAX_PATH + FILENAME_MAX + 1;
@@ -741,7 +737,7 @@ void dump_process::dump_all()
 											else if (header->process_disk_image(&this->_export_list, this->_db_clean))
 											{
 												// Build the name that we will dump this image as
-												char* extension = (header->is_exe() ? "exe" :
+												const char* extension = (header->is_exe() ? "exe" :
 													(header->is_dll() ? "dll" :
 														(header->is_sys() ? "sys" : "bin")));
 												int length = MAX_PATH + FILENAME_MAX + 1;

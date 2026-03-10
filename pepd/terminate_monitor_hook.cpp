@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "terminate_monitor_hook.h"
-
 
 bool terminate_monitor_hook::add_redirect(unsigned __int64 target_address)
 {
@@ -447,7 +445,7 @@ bool terminate_monitor_hook::hook_terminate(export_list* exports)
 						}
 						else
 						{
-							PrintLastError(L"Failed to write NtTerminateProcess hook code.");
+							//PrintLastError(L"Failed to write NtTerminateProcess hook code.");
 						}
 					}
 				}
@@ -455,8 +453,8 @@ bool terminate_monitor_hook::hook_terminate(export_list* exports)
 		}
 		else
 		{
-			if( _options->Verbose )
-				PrintLastError(L"Failed to allocate space for NtTerminateProcess hook.");
+			//if( _options->Verbose )
+				//PrintLastError(L"Failed to allocate space for NtTerminateProcess hook.");
 		}
 
 		return false; // Failed to hook
@@ -498,7 +496,7 @@ void terminate_monitor_hook::resume_terminate()
 	}
 }
 
-terminate_monitor_hook::terminate_monitor_hook(HANDLE ph, DWORD pid, bool is64, PD_OPTIONS* options)
+terminate_monitor_hook::terminate_monitor_hook(HANDLE ph, DWORD pid, bool is64, PEPD_OPTIONS* options)
 {
 	_ph = ph;
 	_pid = pid;

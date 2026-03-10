@@ -1,6 +1,4 @@
-#include "StdAfx.h"
 #include "module_list.h"
-
 
 module_list::module_list()
 {
@@ -37,7 +35,7 @@ module_list::module_list( DWORD pid )
 				}
 				else
 				{
-					PrintLastError(L"module_list GetModuleInformation");
+					//PrintLastError(L"module_list GetModuleInformation");
 				}
 			}
 		}
@@ -48,8 +46,8 @@ module_list::module_list( DWORD pid )
 	{
 		if( GetLastError() == 299 )
 			fprintf(stderr, "ERROR: Unable to open process PID 0x%x since it is a 64 bit process and this tool is running as a 32 bit process.\n", pid);
-		else
-			PrintLastError(L"module_list OpenProcess");
+		//else
+			//PrintLastError(L"module_list OpenProcess");
 	}
 	#elif defined(_WIN32)
 

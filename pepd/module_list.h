@@ -7,9 +7,6 @@
 #include <unordered_map>
 #include "Psapi.h"
 
-using namespace std::tr1;
-
-
 extern bool global_flag_verbose;
 
 class module

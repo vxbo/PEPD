@@ -1,8 +1,6 @@
-#include "StdAfx.h"
 #include "simple.h"
 
-
-DWORD process_find(string match_regex, DynArray<process_description*>* result)
+size_t process_find(string match_regex, std::vector<process_description*>* result)
 {
 	PROCESSENTRY32 entry;
     entry.dwSize = sizeof(PROCESSENTRY32);
@@ -24,10 +22,10 @@ DWORD process_find(string match_regex, DynArray<process_description*>* result)
 					if( regex_match( name, reg ) )
 					{  
 						// Record this as a matching process
-						result->Add( new process_description( process_name, entry.th32ProcessID ) );
+						result->push_back( new process_description( process_name, entry.th32ProcessID ) );
 					}
 				}
-				catch( std::tr1::regex_error e )
+				catch( const std::regex_error& e )
 				{
 					fprintf( stderr, "ERROR: Invalid regex expression for matching process names." );
 					return 0;
@@ -39,7 +37,8 @@ DWORD process_find(string match_regex, DynArray<process_description*>* result)
 
 		CloseHandle(snapshot);
 	}
-	return result->GetSize();
+
+	return result->size();
 }
 
 string ExePath() {

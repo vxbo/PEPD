@@ -33,7 +33,7 @@ class file_stream : stream_wrapper
 	FILE* fh;
 public:
 
-	file_stream(char* filename)
+	file_stream(const char* filename)
 	{
 		// Localize the filename
 		_filename = new char[ strlen(filename) + 1 ];
@@ -47,7 +47,7 @@ public:
 			opened = true;
 		else
 		{
-			PrintLastError(L"Failed to open file.");
+			/*//PrintLastError(L"Failed to open file.");*/
 			opened = false;
 		}
 	}
@@ -108,8 +108,8 @@ public:
 		{
 			if( !fseek( fh, 0, SEEK_END) )
 				return ftell( fh ) - offset;
-			else
-				PrintLastError(L"Seek failed.");
+			//else
+				/*//PrintLastError(L"Seek failed.");*/
 		}
 		return 0;
 	}
@@ -235,14 +235,14 @@ public:
 			{
 				if( GetLastError() == 299 )
 					fprintf(stderr, "ERROR: Unable to open process PID 0x%x since it is a 64 bit process and this tool is running as a 32 bit process.\n", pid);
-				else
-					PrintLastError(L"create_process_stream CreateToolhelp32Snapshot");
+				//else
+					//PrintLastError(L"create_process_stream CreateToolhelp32Snapshot");
 			}
 		}
 		else
 		{
 			fprintf(stderr, "Failed to open process with PID 0x%x:\n", pid );
-			PrintLastError(L"\tcreate_process_stream");
+			//PrintLastError(L"\tcreate_process_stream");
 		}
 	}
 
@@ -262,7 +262,7 @@ public:
 		else
 		{
 			fprintf(stderr, "Failed to open process with PID 0x%x:\n", pid );
-			PrintLastError(L"\tcreate_process_stream");
+			//PrintLastError(L"\tcreate_process_stream");
 		}
 	}
 
@@ -331,7 +331,7 @@ public:
 			}
 			else if( blockSize == 0 )
 			{
-				PrintLastError(L"VirtualQueryEx query block size");
+				//PrintLastError(L"VirtualQueryEx query block size");
 			}
 		}
 		return 0;

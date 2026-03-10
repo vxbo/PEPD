@@ -1,7 +1,6 @@
 #pragma once
 
 #include "nmd_assembly.h"
-#include "stdafx.h"
 #include <stdio.h>
 #include "windows.h"
 #include "stream_wrapper.h"
@@ -16,8 +15,6 @@
 #include "pe_hash_database.h"
 
 using namespace std;
-using namespace std::tr1;
-
 
 #define FILEPATH_SIZE 265
 
@@ -48,12 +45,11 @@ struct IMPORT_SUMMARY
 
 class pe_header
 {
-	
 	unsigned __int64 _unique_hash;
 	unsigned __int64 _unique_hash_ep;
 	unsigned __int64 _unique_hash_ep_short;
 
-	PD_OPTIONS* _options;
+	PEPD_OPTIONS* _options;
 
 	stream_wrapper* _stream;
 	void* _original_base;
@@ -112,10 +108,10 @@ class pe_header
 	__int64 _section_align( __int64 address, DWORD alignment);
 
 public:
-	pe_header( char* filename, PD_OPTIONS* options );
-	pe_header( DWORD pid, void* base, module_list* modules, PD_OPTIONS* options );
-	pe_header( DWORD pid, module_list* modules, PD_OPTIONS* options );
-	pe_header( HANDLE ph, void* base, module_list* modules, PD_OPTIONS* options );
+	pe_header( const char* filename, PEPD_OPTIONS* options );
+	pe_header( DWORD pid, void* base, module_list* modules, PEPD_OPTIONS* options );
+	pe_header( DWORD pid, module_list* modules, PEPD_OPTIONS* options );
+	pe_header( HANDLE ph, void* base, module_list* modules, PEPD_OPTIONS* options );
 	
 	bool build_pe_header( __int64 size, bool amd64 );
 	bool build_pe_header( __int64 size, bool amd64, int num_sections_limit );
@@ -123,7 +119,8 @@ public:
 	bool process_pe_header( );
 	bool process_import_directory( );
 	bool process_export_directory( );
-	bool process_relocation_directory();
+	// stub
+	/*bool process_relocation_directory();*/
 	bool process_sections( );
 	bool process_disk_image(export_list* exports, pe_hash_database* hash_database);
 	bool process_hash( );
@@ -147,12 +144,13 @@ public:
 	bool is_dll();
 	bool is_exe();
 	bool is_sys();
-	char* get_name();
-	void set_name(char* new_name);
+	const char* get_name();
+	void set_name(const char* new_name);
 
 	void print_report( FILE* stream );
 
-	__int64 get_export_addresses();
+	// stub
+	/*__int64 get_export_addresses();*/
 	
 	~pe_header(void);
 };

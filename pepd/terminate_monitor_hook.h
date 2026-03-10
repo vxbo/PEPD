@@ -16,7 +16,7 @@ class terminate_monitor_hook
 	unsigned __int64 _address_thread_id;
 	unsigned char _original_hook_bytes[32];
 	bool _process_is_terminating;
-	PD_OPTIONS* _options;
+	PEPD_OPTIONS* _options;
 
 	bool add_redirect(unsigned __int64 target_address);
 	
@@ -30,7 +30,7 @@ public:
 	bool is_terminate_waiting();
 	void resume_terminate();
 
-	terminate_monitor_hook(HANDLE ph, DWORD pid, bool is64, PD_OPTIONS* _options);
+	terminate_monitor_hook(HANDLE ph, DWORD pid, bool is64, PEPD_OPTIONS* _options);
 	~terminate_monitor_hook();
 };
 

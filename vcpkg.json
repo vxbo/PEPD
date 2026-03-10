@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "boost",
+    "cli11",
+    "spdlog",
+    "capstone"
+  ]
+}

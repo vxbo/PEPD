@@ -1,6 +1,5 @@
 #pragma once
 
-#include "DynArray.h"
 #include "windows.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +10,6 @@
 #include "limits.h"
 
 using namespace std;
-using namespace std::tr1;
 
 class export_entry
 {
@@ -50,7 +48,7 @@ public:
 	void add_export(unsigned __int64 address, export_entry* entry);
 
 	// Find export addresses in a process
-	unsigned __int64 find_export(char* library, char* name, bool is64);
+	unsigned __int64 find_export(const char* library, const char* name, bool is64);
 
 	// Functions to get quick filter values before doing a lookup
 	bool contains(unsigned __int64 address);

@@ -30,9 +30,6 @@
     <ClCompile Include="pepd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pe_exports.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pe_hash_database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,9 +53,6 @@
     <ClInclude Include="dump_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DynArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="export_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="module_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pe_exports.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pe_hash_database.h">
@@ -98,9 +89,6 @@
     <ClInclude Include="close_watcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="work_queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="nmd_assembly.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -109,7 +97,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="pd.rc">
+    <ResourceCompile Include="pepd.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

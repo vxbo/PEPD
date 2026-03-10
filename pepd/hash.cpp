@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "hash.h"
 
 /* Crc - 32 BIT ANSI X3.66 CRC checksum files */
