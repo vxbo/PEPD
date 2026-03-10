@@ -1,8 +1,12 @@
 # PEPD
 
-[![Fork status](https://img.shields.io/badge/fork%20status-wip-orange?style=for-the-badge)]
+![Fork status](https://img.shields.io/badge/fork%20status-wip-orange?style=for-the-badge)
 
-PEPD is a Windows reverse-engineering command-line tool to dump malware memory components back to disk for analysis. Often malware files are packed and obfuscated before they are executed in order to avoid AV scanners, however when these files are executed they will often unpack or inject a clean version of the malware code in memory. A common task for malware researchers when analyzing malware is to dump this unpacked code back from memory to disk for scanning with AV products or for analysis with static analysis tools such as IDA.
+PEPD is fork of  Windows reverse-engineering command-line tool to dump malware memory components back to disk for analysis. Often malware files are packed and obfuscated before they are executed in order to avoid AV scanners, however when these files are executed they will often unpack or inject a clean version of the malware code in memory. A common task for malware researchers when analyzing malware is to dump this unpacked code back from memory to disk for scanning with AV products or for analysis with static analysis tools such as IDA.
+
+## My mission
+
+The original Process Dump project has been unmaintained since 2023, with some code dating back over a decade. This fork aims to modernize the codebase, improve maintainability, and gradually introduce new features while preserving the core functionality.
 
 ## Features
 
@@ -40,11 +44,11 @@ The command-line arguments can be grouped as follows:
 | Option | Description |
 |--------|-------------|
 | -system | Dumps all modules not matching the clean hash database from all accessible processes into the working directory. |
-| -pid \<pid\> | Dumps all modules not matching the clean hash database from the specified PID into the current working directory. Use a '0x' prefix to specify a hex PID. |
+| -pid \<`pid`\> | Dumps all modules not matching the clean hash database from the specified PID into the current working directory. Use a '0x' prefix to specify a hex PID. |
 | -closemon | Runs in monitor mode. When any processes are terminating, process dump will first dump the process. |
-| -p \<regex process name\> | Dumps all modules not matching the clean hash database from the process name found to match the filter into specified PID into the current working directory. |
-| -a \<module base address\> | Dumps a module at the specified base address from the process. |
-| -o \<path\> | Sets the default output root folder for dumped components. |
+| -p \<`regex process name`\> | Dumps all modules not matching the clean hash database from the process name found to match the filter into specified PID into the current working directory. |
+| -a \<`module base address`\> | Dumps a module at the specified base address from the process. |
+| -o \<`path`\> | Sets the default output root folder for dumped components. |
 
 ### Clean Hash Database Options
 
@@ -52,14 +56,14 @@ The command-line arguments can be grouped as follows:
 |--------|-------------|
 | -db gen | Automatically processes a few common folders as well as all the currently running processes and adds the found module hashes to the clean hash database. It will add all files recursively in: `%WINDIR%`, `%HOMEPATH%`, `C:\Program Files\`, `C:\Program Files (x86)\`, as well as all modules in all running processes. These clean hashes will be added to the file `clean.hashes` in the application directory. During future process dumping commands, these known modules will not be dumped. It is recommended to run this command one time on a clean system prior to using the tool that way not too many modules will be dumped from memory.|
 | -db genquick | Same as above, but only adds the hashes from all modules in all processes to the clean hash database. This is a much faster way to build the clean hash database, but it will be less complete. |
-| -db add \<dir\> | Adds all the files in the specified directory recursively to the clean hash database. |
-| -db rem \<dir\> | Removes all the files in the specified directory recursively from the clean hash database. |
+| -db add \<`dir`\> | Adds all the files in the specified directory recursively to the clean hash database. |
+| -db rem \<`dir`\> | Removes all the files in the specified directory recursively from the clean hash database. |
 | -nr | Disable recursion on hash database directory add or remove commands. |
 | -db clean | Clears the clean hash database. |
 | -db ignore | Ignores the clean hash database when dumping a process this time. All modules will be dumped even if a match is found. |
-| -cdb \<filepath\> | Full filepath to the clean hash database to use for this run if you'd like to override the default of `clean.hashes`. |
-| -edb \<filepath\> | Full filepath to the entrypoint hash database to use for this run. |
-| -esdb \<filepath\> | Full filepath to the entrypoint short hash database to use for this run. |
+| -cdb \<`filepath`\> | Full filepath to the clean hash database to use for this run if you'd like to override the default of `clean.hashes`. |
+| -edb \<`filepath`\> | Full filepath to the entrypoint hash database to use for this run. |
+| -esdb \<`filepath`\> | Full filepath to the entrypoint short hash database to use for this run. |
 
 ### Output Options
 
@@ -78,7 +82,7 @@ The command-line arguments can be grouped as follows:
 | -nc | Disable dumping of loose code regions. |
 | -nt | Disable multithreading. |
 | -nep | Disable entry point hashing. |
-| -t \<thread count\> | Sets the number of threads to use (default 16). |
+| -t \<`thread count`\> | Sets the number of threads to use (default 16). |
 
 ## Usage Examples
 
@@ -112,10 +116,17 @@ The dumped components will be found in the working directory of `pepd64.exe`. To
 
 Example filenames of dumped files:
 
-* notepad_exe_PID2990_hiddenmodule_16B8ABB0000_x86.dll
-* notepad_exe_PID3b5c_notepad.exe_7FF6E6630000_x64.exe
-* notepad_exe_PID2c54_codechunk_17BD0000_x86.dll
-* notepad_exe_PID2c54_codechunk_17BD0000_x64.dll
+* `notepad_exe_PID2990_hiddenmodule_16B8ABB0000_x86.dll`
+* `notepad_exe_PID3b5c_notepad.exe_7FF6E6630000_x64.exe`
+* `notepad_exe_PID2c54_codechunk_17BD0000_x86.dll`
+* `notepad_exe_PID2c54_codechunk_17BD0000_x64.dll`
+
+## Roadmap
+
+1. Rewrite for C++23.
+2. Integrate external libraries.
+3. Improve functionality.
+4. Implement new functionality.
 
 ## Version history
 
