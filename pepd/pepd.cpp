@@ -366,13 +366,13 @@ void dump_system(pe_hash_database* db, PEPD_OPTIONS* options)
 	delete []threads;
 }
 
-int main(int argc, TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 
 	get_privileges( GetCurrentProcess() );
 
-	// Process the flags	
-	WCHAR* filter = NULL;
+	// Process the flags
+	char* filter = NULL;
 	char* processNameFilter = NULL;
 	char* clean_database;
 	char* ep_database;
@@ -426,32 +426,47 @@ int main(int argc, TCHAR* argv[])
 
 	for( int i = 1; i < argc; i++ )
 	{
-		if( lstrcmp(argv[i],L"--help") == 0 || lstrcmp(argv[i],L"-help") == 0 || lstrcmp(argv[i],L"-h") == 0 || lstrcmp(argv[i],L"--h") == 0)
+		/*if( lstrcmp(argv[i],L"--help") == 0 || lstrcmp(argv[i],L"-help") == 0 || lstrcmp(argv[i],L"-h") == 0 || lstrcmp(argv[i],L"--h") == 0)*/
+		if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-help") == 0 || 
+			strcmp(argv[i], "--h") == 0 || strcmp(argv[i], "-h") == 0)
 			flagHelp = true;
-		else if( lstrcmp(argv[i],L"-nh") == 0 )
+		/*else if( lstrcmp(argv[i],L"-nh") == 0 )*/
+		else if (strcmp(argv[i], "-nh") == 0)
 			flagHeader = false;
-		else if( lstrcmp(argv[i],L"-nr") == 0 )
+		/*else if( lstrcmp(argv[i],L"-nr") == 0 )*/
+		else if (strcmp(argv[i], "-nr") == 0)
 			flagRecursion = false;
-		else if( lstrcmp(argv[i],L"-ni") == 0 )
+		/*else if( lstrcmp(argv[i],L"-ni") == 0 )*/
+		else if (strcmp(argv[i], "-ni") == 0)
 			options.ImportRec = false;
-		else if( lstrcmp(argv[i],L"-nc") == 0 )
+		/*else if( lstrcmp(argv[i],L"-nc") == 0 )*/
+		else if (strcmp(argv[i], "-nc") == 0)
 			options.DumpChunks = false;
-		else if (lstrcmp(argv[i], L"-nep") == 0)
+		/*else if (lstrcmp(argv[i], L"-nep") == 0)*/
+		else if (strcmp(argv[i], "-nep") == 0)
 			options.EntryPointHash = false;
-		else if (lstrcmp(argv[i], L"-nt") == 0)
+		/*else if (lstrcmp(argv[i], L"-nt") == 0)*/
+		else if(strcmp(argv[i], "-nt") == 0)
 			options.NumberOfThreads = 1;
-		else if (lstrcmp(argv[i], L"-eprec") == 0)
+		/*else if (lstrcmp(argv[i], L"-eprec") == 0)*/
+		else if (strcmp(argv[i], "-eprec") == 0)
 			options.ForceReconstructEntryPoint = true;
-		else if (lstrcmp(argv[i], L"-closemon") == 0)
+		/*else if (lstrcmp(argv[i], L"-closemon") == 0)*/
+		else if (strcmp(argv[i], "-closemon") == 0 ||
+				 strcmp(argv[i], "-cm") == 0)
 			flagDumpCloses = true;
-		else if( lstrcmp(argv[i],L"-v") == 0 )
+		/*else if( lstrcmp(argv[i],L"-v") == 0 )*/
+		else if (strcmp(argv[i], "-verbose") == 0 ||
+				 strcmp(argv[i], "-v") == 0)
 		{
 			options.Verbose = true;
 			global_flag_verbose = true;
 		}
-		else if( lstrcmp(argv[i],L"-g") == 0 )
+		/*else if( lstrcmp(argv[i],L"-g") == 0 )*/
+		else if (strcmp(argv[i], "-g") == 0)
 			options.ForceGenHeader = true;
-		else if( lstrcmp(argv[i],L"-pid") == 0 )
+		/*else if( lstrcmp(argv[i],L"-pid") == 0 )*/
+		else if (strcmp(argv[i], "-pid") == 0)
 		{
 			if( i + 1 < argc )
 			{
@@ -472,8 +487,8 @@ int main(int argc, TCHAR* argv[])
 				delete[] prefix;
 				
 				// Extract the pid from the string
-				if( (isHex && swscanf(filter, L"%x", &pid) > 0) ||
-					(!isHex && swscanf(filter, L"%i", &pid) > 0))
+				if( (isHex && sscanf_s(filter, "%x", &pid) > 0) ||
+					(!isHex && sscanf_s(filter, "%i", &pid) > 0))
 				{
 					// Successfully parsed the PID
 					flagPidDump = true;
@@ -493,7 +508,8 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-a") == 0 )
+		/*else if( lstrcmp(argv[i],L"-a") == 0 )*/
+		else if (strcmp(argv[i], "-a") == 0)
 		{
 			if( i + 1 < argc )
 			{
@@ -514,8 +530,8 @@ int main(int argc, TCHAR* argv[])
 				delete[] prefix;
 				
 				// Extract the pid from the string
-				if( (isHex && swscanf(filter, L"%llx", &address) > 0) ||
-					(!isHex && swscanf(filter, L"%llu", &address) > 0))
+				if( (isHex && sscanf_s(filter, "%llx", &address) > 0) ||
+					(!isHex && sscanf_s(filter, "%llu", &address) > 0))
 				{
 					// Successfully parsed the PID
 					flagAddressDump = true;
@@ -535,13 +551,14 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-p") == 0 )
+		/*else if( lstrcmp(argv[i],L"-p") == 0 )*/
+		else if (strcmp(argv[i], "-p") == 0)
 		{
 			if( i + 1 < argc )
 			{
 				// Extract the process name filter regex
-				processNameFilter = new char[wcslen(argv[i+1]) + 1];
-				sprintf( processNameFilter, "%S", argv[i+1] );
+				processNameFilter = argv[i+1];
+				sprintf( processNameFilter, "%s", argv[i+1] );
 				
 				flagProcessNameDump = true;
 				
@@ -554,7 +571,8 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-t") == 0 )
+		/*else if( lstrcmp(argv[i],L"-t") == 0 )*/
+		else if (strcmp(argv[i], "-t") == 0)
 		{
 			if( i + 1 < argc )
 			{
@@ -575,8 +593,8 @@ int main(int argc, TCHAR* argv[])
 				delete[] prefix;
 				
 				// Extract the number from the string
-				if( (isHex && swscanf(filter, L"%x", &options.NumberOfThreads) > 0) ||
-					(!isHex && swscanf(filter, L"%i", &options.NumberOfThreads) > 0))
+				if( (isHex && sscanf_s(filter, "%x", &options.NumberOfThreads) > 0) ||
+					(!isHex && sscanf_s(filter, "%i", &options.NumberOfThreads) > 0))
 				{
 					// Successfully parsed the value
 					if( options.NumberOfThreads < 1 )
@@ -601,13 +619,14 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-c") == 0 || lstrcmp(argv[i], L"-cdb") == 0)
+		/*else if( lstrcmp(argv[i],L"-c") == 0 || lstrcmp(argv[i], L"-cdb") == 0)*/
+		else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "-cdb") == 0)
 		{
 			if( i + 1 < argc )
 			{
 				// Extract the path to use as the clean file database
-				clean_database = new char[wcslen(argv[i+1]) + 1];
-				sprintf( clean_database, "%S", argv[i+1] );
+				clean_database = argv[i+1];
+				sprintf( clean_database, "%s", argv[i+1] );
 				printf_s("Set clean database filepath to %s.\n", clean_database);
 				
 				// Skip next argument
@@ -619,13 +638,14 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if (lstrcmp(argv[i], L"-edb") == 0)
+		/*else if (lstrcmp(argv[i], L"-edb") == 0)*/
+		else if (strcmp(argv[i], "-edb") == 0)
 		{
 			if (i + 1 < argc)
 			{
 				// Extract the path to use as the clean file database
-				ep_database = new char[wcslen(argv[i + 1]) + 1];
-				sprintf(ep_database, "%S", argv[i + 1]);
+				ep_database = argv[i + 1];
+				sprintf(ep_database, "%s", argv[i + 1]);
 				printf_s("Set entrypoint database filepath to %s.\n", ep_database);
 
 				// Skip next argument
@@ -637,13 +657,14 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if (lstrcmp(argv[i], L"-esdb") == 0)
+		/*else if (lstrcmp(argv[i], L"-esdb") == 0)*/
+		else if (strcmp(argv[i], "-esdb") == 0)
 		{
 			if (i + 1 < argc)
 			{
 				// Extract the path to use as the clean file database
-				epshort_database = new char[wcslen(argv[i + 1]) + 1];
-				sprintf(epshort_database, "%S", argv[i + 1]);
+				epshort_database = argv[i + 1];
+				sprintf(epshort_database, "%s", argv[i + 1]);
 				printf_s("Set entrypoint short database filepath to %s.\n", epshort_database);
 
 				// Skip next argument
@@ -655,16 +676,17 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-o") == 0 )
+		/*else if( lstrcmp(argv[i],L"-o") == 0 )*/
+		else if (strcmp(argv[i], "-o") == 0)
 		{
 			if( i + 1 < argc )
 			{
 				// Extract the default output path to use
-				char* output_path = new char[wcslen(argv[i+1]) + 1];
-				sprintf( output_path, "%S", argv[i+1] );
+				char* output_path = argv[i+1];
+				sprintf( output_path, "%s", argv[i+1] );
 				options.set_output_path( output_path );
 				printf_s("Set output path to %s.\n", output_path);
-				delete [] output_path;
+				delete [] output_path; // PRO NOOB HACKER
 				
 				// Skip next argument
 				i++;
@@ -675,9 +697,11 @@ int main(int argc, TCHAR* argv[])
 				exit(0);
 			}
 		}
-		else if( lstrcmp(argv[i],L"-system") == 0 )
+		/*else if( lstrcmp(argv[i],L"-system") == 0 )*/
+		else if (strcmp(argv[i], "-system") == 0)
 			flagSystemDump = true;
-		else if( lstrcmp(argv[i],L"-db") == 0 )
+		/*else if( lstrcmp(argv[i],L"-db") == 0 )*/
+		else if (strcmp(argv[i], "-db") == 0)
 		{
 			// Process the db commands
 			if(  i + 1 < argc )
@@ -688,26 +712,30 @@ int main(int argc, TCHAR* argv[])
 				// -db add [directory]
 				// -db clean
 				// -db ignore
-				if( lstrcmp(argv[i+1],L"gen") == 0 )
+				if (strcmp(argv[i], "gen") == 0)
 				{
 					flagDB_gen = true;
-				}else if( lstrcmp(argv[i+1],L"genquick") == 0 )
+				}
+				else if (strcmp(argv[i], "genquick") == 0)
 				{
 					flagDB_genQuick = true;
-				}else if( lstrcmp(argv[i+1],L"clean") == 0 )
+				}
+				else if (strcmp(argv[i], "clean") == 0)
 				{
 					flagDB_clean = true;
-				}else if( lstrcmp(argv[i+1],L"ignore") == 0 )
+				}
+				else if (strcmp(argv[i], "ignore") == 0)
 				{
 					flagDB_ignore = true;
-				}else if( lstrcmp(argv[i+1],L"add") == 0 )
+				}
+				else if (strcmp(argv[i], "add") == 0)
 				{
 					// Has yet another argument to specify the directory to add
 					if(  i + 2 < argc )
 					{
 						// Extract the directory name to add
-						add_directory = new char[wcslen(argv[i+2]) + 2];
-						sprintf( add_directory, "%S", argv[i+2] );
+						add_directory = argv[i+2];
+						sprintf( add_directory, "%s", argv[i+2] );
 
 						// Add a trailing slash if it doesn't exist
 						if (add_directory[strlen(add_directory) - 1] != '\\' && add_directory[strlen(add_directory) - 1] != '//')
@@ -733,15 +761,16 @@ int main(int argc, TCHAR* argv[])
 						fprintf(stderr,"Failed to parse '-db add' argument. It must be followed by a directory to add:\n\teg. 'pd -db add C:\\Windows\\'\n");
 						exit(0);
 					}
-					i+=1;
-				}else if( lstrcmp(argv[i+1],L"remove") == 0 || lstrcmp(argv[i+1],L"rem") == 0 )
+					i++;
+				}
+				else if (strcmp(argv[i], "remove") == 0 || strcmp(argv[i], "rem") == 0)
 				{
 					// Has yet another argument to specify the directory to remove
 					if(  i + 2 < argc )
 					{
 						// Extract the directory name to remove
-						add_directory = new char[wcslen(argv[i+2]) + 2];
-						sprintf( add_directory, "%S", argv[i+2] );
+						add_directory = argv[i+2];
+						sprintf( add_directory, "%s", argv[i+2] );
 
 						// Add a trailing slash if it doesn't exist
 						if (add_directory[strlen(add_directory) - 1] != '\\' && add_directory[strlen(add_directory) - 1] != '//')
@@ -767,18 +796,21 @@ int main(int argc, TCHAR* argv[])
 						fprintf(stderr,"Failed to parse '-db remove' argument. It must be followed by a directory to remove:\n\teg. 'pd -db add C:\\Windows\\'\n");
 						exit(0);
 					}
-					i+=1;
+					i++;
 				}
 
-
-				i+=1;
-			}else{
+				i++;
+			}
+			else
+			{
 				fprintf(stderr,"Failed to parse -db argument. It must be followed by a command:\n\teg. 'pd -db genquick'\n");
 				exit(0);
 			}
-		}else{
+		}
+else
+		{
 			// This is an unassigned argument
-			fprintf(stderr,"Failed to parse argument number %i, '%S'. Try 'pd --help' for usage instructions.\n", i, argv[i]);
+			fprintf(stderr,"Failed to parse argument number %i, '%s'. Try 'pd --help' for usage instructions.\n", i, argv[i]);
 			exit(0);
 		}
 	}
@@ -794,18 +826,18 @@ int main(int argc, TCHAR* argv[])
 	if( flagHelp )
 	{
 		// Print help page
-		printf_s("Process Dump (pd.exe) is a tool used to dump both 32 and 64 bit executable modules back to disk from memory within a process address space. This tool is able to find and dump hidden modules as well as loose executable code chunks, and it uses a clean hash database to exclude dumping of known clean files. This tool uses an aggressive import reconstruction approach that links all DWORD/QWORDs that point to an export in the process to the corresponding export function. Process dump can be used to dump all unknown code from memory ('-system' flag), dump specific processes, or run in a monitoring mode that dumps all processes just before they terminate.\n\n");
+		printf_s("PEPD (pepd.exe) is fork of a tool used to dump both 32- and 64-bit executable modules back to disk from memory within a process address space. This tool is able to find and dump hidden modules as well as loose executable code chunks, and it uses a clean hash database to exclude dumping of known clean files. This tool uses an aggressive import reconstruction approach that links all DWORD/QWORDs that point to an export in the process to the corresponding export function. Process dump can be used to dump all unknown code from memory ('-system' flag), dump specific processes, or run in a monitoring mode that dumps all processes just before they terminate.\n\n");
 		printf_s("Before first usage of this tool, when on the clean workstation the clean exclusing hash database can be generated by either:\n");
-		printf_s("\tpd -db gen\n");
-		printf_s("\tpd -db genquick\n\n");
+		printf_s("\%s -db gen\n", argv[0]);
+		printf_s("\%s -db genquick\n\n", argv[0]);
 		printf_s("Example Usage:\n");
-		printf_s("\tpd -system\n");
-		printf_s("\tpd -pid 419\n");
-		printf_s("\tpd -pid 0x1a3\n");
-		printf_s("\tpd -pid 0x1a3 -a 0x401000 -o c:\\dump\\ -c c:\\dump\\test\\clean.db\n");
-		printf_s("\tpd -p chrome.exe\n");
-		printf_s("\tpd -p \"(?i).*chrome.*\"\n");
-		printf_s("\tpd -closemon\n\n");
+		printf_s("\%s -system\n", argv[0]);
+		printf_s("\%s -pid 419\n", argv[0]);
+		printf_s("\%s -pid 0x1a3\n", argv[0]);
+		printf_s("\%s -pid 0x1a3 -a 0x401000 -o c:\\dump\\ -c c:\\dump\\test\\clean.db\n", argv[0]);
+		printf_s("\%s -p chrome.exe\n", argv[0]);
+		printf_s("\%s -p \"(?i).*chrome.*\"\n", argv[0]);
+		printf_s("\%s -closemon\n\n", argv[0]);
 
 		printf_s("Options:\n");
 		printf_s("\t-system\t\tDumps all modules not matching the clean hash database\n\t\t\tfrom all accessible processes into the working\n\t\t\tdirectory.\n\n");
@@ -891,7 +923,7 @@ int main(int argc, TCHAR* argv[])
 			printf_s("Adding all files in folder '%s' to clean hash and entrypoint database...\n", add_directory);
 
 		int count_before = db->count();
-		db->add_folder(add_directory, (wchar_t*)"*", flagRecursion);
+		db->add_folder(add_directory, "*", flagRecursion);
 		printf_s("Added %i new hashes to the database. It now has %i hashes.\n", db->count() - count_before, db->count());
 		db->save();
 	}else if( flagDB_remove )
@@ -903,7 +935,7 @@ int main(int argc, TCHAR* argv[])
 			printf_s("Removing all files in folder '%s' from the clean hash database...\n", add_directory);
 		
 		int count_before = db->count();
-		db->remove_folder(add_directory, (wchar_t*)"*", flagRecursion);
+		db->remove_folder(add_directory, "*", flagRecursion);
 		printf_s("Removed %i hashes from the database. It now has %i hashes.\n", count_before - db->count(), db->count());
 		db->save();
 	}else if( flagDB_gen )
@@ -920,25 +952,25 @@ int main(int argc, TCHAR* argv[])
 		// Add a bunch of folders to the database
 		count_before = db->count();
 		printf_s("Adding files in %%WINDIR%% to clean hash database...\n");
-		db->add_folder("%WINDIR%", (wchar_t*)"*", true);
+		db->add_folder("%WINDIR%", "*", true);
 		printf_s("...added %i new hashes from %%WINDIR%%.\n", db->count() - count_before);
 		db->save();
 
 		count_before = db->count();
 		printf_s("Adding files in %%USERPROFILE%% to clean hash database...\n");
-		db->add_folder("%USERPROFILE%", (wchar_t*)"*", true);
+		db->add_folder("%USERPROFILE%", "*", true);
 		printf_s("...added %i new hashes from %%USERPROFILE%%.\n", db->count() - count_before);
 		db->save();
 
 		count_before = db->count();
 		printf_s("Adding files in 'C:\\Program Files\\' to clean hash database...\n");
-		db->add_folder("C:\\Program Files\\", (wchar_t*)"*", true);
+		db->add_folder("C:\\Program Files\\", "*", true);
 		printf_s("...added %i new hashes from 'C:\\Program Files\\'.\n", db->count() - count_before);
 		db->save();
 
 		count_before = db->count();
 		printf_s("Adding files in C:\\Program Files (x86)\\ to clean hash database...\n");
-		db->add_folder("C:\\Program Files (x86)\\", (wchar_t*)"*", true);
+		db->add_folder("C:\\Program Files (x86)\\", "*", true);
 		printf_s("...added %i new hashes from 'C:\\Program Files (x86)\\'.\n", db->count() - count_before);
 		db->save();
 
