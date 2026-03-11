@@ -1,6 +1,7 @@
 #pragma once
 
 #include "windows.h"
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdexcept>
@@ -45,7 +46,7 @@ public:
 	
 	bool add_exports(unsigned char* image, SIZE_T image_size, unsigned __int64 image_base, IMAGE_EXPORT_DIRECTORY* header_export_directory, bool is64);
 	bool add_exports(export_list* other);
-	void add_export(unsigned __int64 address, export_entry* entry);
+	void add_export(unsigned __int64 address, export_entry entry);
 
 	// Find export addresses in a process
 	unsigned __int64 find_export(const char* library, const char* name, bool is64);

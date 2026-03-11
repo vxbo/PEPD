@@ -3,6 +3,7 @@
 #include <ranges>
 #include <codecvt>
 #include <unordered_map>
+#include <chrono>
 
 namespace views = std::views;
 using namespace std::chrono_literals;
@@ -101,9 +102,8 @@ void close_watcher::_monitor_dump_on_close(std::stop_token stop_token)
 			if (it->second->monitor_close_is_waiting())
 			{
 				// Dump this process by adding it to the multi-threaded dumping queue
-				char name[0x200];
-				it->second->get_process_name(name, sizeof(name));
-				std::println("Process {} requesting to close, we are dumping it...", name);
+
+				std::println("Process {} requesting to close, we are dumping it...", it->second->get_process_name());
 
 				// Transfer ownership from hooked map
 				_work_queue.push(std::move(it->second));

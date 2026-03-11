@@ -103,7 +103,6 @@ class pe_header
 	unsigned __int64 _hash_asm(SIZE_T offset);
 	unsigned __int64 _hash_short_asm(SIZE_T offset);
 	
-	
 	DWORD _section_align( DWORD address, DWORD alignment);
 	__int64 _section_align( __int64 address, DWORD alignment);
 
@@ -135,7 +134,7 @@ public:
 	IMPORT_SUMMARY get_imports_information( export_list* exports );
 	IMPORT_SUMMARY get_imports_information( export_list* exports, __int64 size_limit );
 
-	bool write_image( char* filename );
+	bool write_image( const char* filename );
 
 	export_list* get_exports();
 	unsigned __int64 get_virtual_size();

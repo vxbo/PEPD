@@ -144,12 +144,12 @@ export_entry export_list::find(unsigned __int64 address)
 	return NULL;
 }
 
-void export_list::add_export(unsigned __int64 address, export_entry* entry)
+void export_list::add_export(unsigned __int64 address, export_entry entry)
 {
 	// Register this export address for quick lookups later
 	if (_address_to_exports.count(address) == 0)
 	{
-		_address_to_exports.insert(std::pair<unsigned __int64, export_entry*>(address, new export_entry(entry)));
+		_address_to_exports.insert(std::pair<unsigned __int64, export_entry*>(address, new export_entry(&entry)));
 
 		if (_addresses.count(address) == 0)
 		{
@@ -240,9 +240,8 @@ bool export_list::add_exports(unsigned char* image, SIZE_T image_size, unsigned 
 						__int64 address = image_base + rva;
 						
 						// Add this export
-						export_entry* new_entry = new export_entry( library_name, name, ordinal, rva, address, is64);
-						add_export(address, new_entry);
-						delete new_entry;
+						auto new_entry = std::make_unique<export_entry>( library_name, name, ordinal, rva, address, is64);
+						add_export(address, new_entry.get());
 					}
 				}
 				

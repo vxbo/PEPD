@@ -530,7 +530,7 @@ bool pe_header::process_hash_ep()
 }
 
 
-bool pe_header::write_image( char* filename )
+bool pe_header::write_image( const char* filename )
 {
 	// Writes the loaded and reconstructed memory image to a file
 	if( _disk_image_size > 0 )

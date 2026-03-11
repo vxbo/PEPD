@@ -5,10 +5,7 @@
 #include "dump_process.hpp"
 #include <Windows.h>
 #include <queue>
-#include <filesystem>
 #include "simple.hpp"
-
-namespace fs = std::filesystem;
 
 class close_watcher
 {
@@ -25,7 +22,7 @@ private:
 	void _dump_process_worker_and_close(std::stop_token stop_token);
 
 public:
-	close_watcher(pe_hash_database* clean_db, PEPD_OPTIONS* options) noexcept;
+	explicit close_watcher(pe_hash_database* clean_db, PEPD_OPTIONS* options) noexcept;
 
 	~close_watcher() = default;
 	close_watcher(const close_watcher&) = delete;
