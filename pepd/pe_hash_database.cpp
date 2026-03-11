@@ -207,7 +207,7 @@ bool pe_hash_database::add_hashes_eps(unordered_set<unsigned __int64> hashes, un
 }
 	
 
-bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool recursively )
+bool pe_hash_database::add_folder( const char* dir_name, const char* filter, bool recursively )
 {
 	// Expand the environment names in the directory
 	char dir_name_expanded[PATH_MAX + 1];
@@ -224,7 +224,7 @@ bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool rec
 				/* print all the files and directories within directory */
 				while ((ent = readdir(dir)) != NULL) {
 					// Convert the path to wchar format
-					wchar_t* result = new wchar_t[strlen(ent->d_name) + 1];
+					char* result = ent->d_name;
 
 					if (result != NULL)
 					{
@@ -235,7 +235,7 @@ bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool rec
 						if ((ent->d_type & DT_DIR))
 						{
 							// Process this subdirectory if recursive flag is on
-							if (recursively && wcscmp(result, L".") != 0 && wcscmp(result, L"..") != 0)
+							if (recursively && strcmp(result, ".") != 0 && strcmp(result, "..") != 0)
 							{
 								// Build the directory path
 								char* directory = new char[strlen(dir_name_expanded) + strlen(ent->d_name) + 2];
@@ -249,13 +249,13 @@ bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool rec
 						}
 						else {
 							// Check if this filename is a match to the specified pattern
-							if (PathMatchSpec(result, filter))
+							if (PathMatchSpecA(result, filter))
 							{
 								// Process this file
-								int length = wcslen(result) + strlen(dir_name_expanded) + 1;
+								int length = strlen(result) + strlen(dir_name_expanded) + 1;
 								char* filename = new char[length + 1];
 								filename[length] = 0;
-								sprintf(filename, "%s\\%S", dir_name_expanded, result);
+								sprintf(filename, "%s\\%s", dir_name_expanded, result);
 
 								// Processes the specified file
 								FILE* fh = fopen(filename, "rb");
@@ -277,7 +277,6 @@ bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool rec
 								delete[] filename;
 							}
 						}
-						delete[] result;
 					}
 					else
 					{
@@ -296,12 +295,11 @@ bool pe_hash_database::add_folder( const char* dir_name, WCHAR* filter, bool rec
 }
 
 
-bool pe_hash_database::remove_folder( char* dir_name, WCHAR* filter, bool recursively )
+bool pe_hash_database::remove_folder( char* dir_name, const char* filter, bool recursively )
 {
 	// Expand the environment names in the directory
 	char* dir_name_expanded = new char[1000];
 	ExpandEnvironmentStringsA( dir_name, dir_name_expanded, 1000 );
-
 
 	DIR *dir;
 	struct dirent *ent;
@@ -309,9 +307,9 @@ bool pe_hash_database::remove_folder( char* dir_name, WCHAR* filter, bool recurs
 	if (dir != NULL)
 	{
 		/* print all the files and directories within directory */
-		while ((ent = readdir (dir)) != NULL) {
-			// Convert the path to wchar format
-			wchar_t* result = new wchar_t[ent->d_namlen + 1];
+		while ((ent = readdir (dir)) != NULL)
+		{
+			char* result = ent->d_name;
 
 			if( result != NULL )
 			{
@@ -322,7 +320,7 @@ bool pe_hash_database::remove_folder( char* dir_name, WCHAR* filter, bool recurs
 				if( (ent->d_type & DT_DIR) )
 				{
 					// Process this subdirectory if recursive flag is on
-					if( recursively && wcscmp(result, L".") != 0 && wcscmp(result, L"..") != 0  )
+					if( recursively && strcmp(result, ".") != 0 && strcmp(result, "..") != 0  )
 					{
 						// Build the directory path
 						char* directory = new char[strlen(dir_name_expanded) + strlen(ent->d_name) + 2];
@@ -335,10 +333,10 @@ bool pe_hash_database::remove_folder( char* dir_name, WCHAR* filter, bool recurs
 					}
 				}else{
 					// Check if this filename is a match to the specified pattern
-					if( PathMatchSpec( result, filter ) )
+					if( PathMatchSpecA( result, filter ) )
 					{
 						// Process this file
-						int length = wcslen(result) + strlen(dir_name_expanded) + 1;
+						int length = strlen(result) + strlen(dir_name_expanded) + 1;
 						char* filename = new char[length + 1];
 						filename[length] = 0;
 						sprintf( filename, "%s\\%S", dir_name_expanded, result );
@@ -362,7 +360,6 @@ bool pe_hash_database::remove_folder( char* dir_name, WCHAR* filter, bool recurs
 						delete[] filename;
 					}
 				}
-				delete[] result;
 			}
 			else
 			{

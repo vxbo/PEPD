@@ -39,8 +39,8 @@ public:
 	bool add_hashes(unordered_set<unsigned __int64> hashes);
 	bool add_hashes_eps(unordered_set<unsigned __int64> hashes, unordered_set<unsigned __int64> hashes_short);
 
-	bool add_folder( const char* dir_name, WCHAR* filter, bool recursively );
-	bool remove_folder( char* dir_name, WCHAR* filter, bool recursively );
+	bool add_folder( const char* dir_name, const char* filter, bool recursively );
+	bool remove_folder( char* dir_name, const char* filter, bool recursively );
 	bool contains(unsigned __int64 hash);
 	bool contains_epshort(unsigned __int64 hash);
 	bool contains_ep(unsigned __int64 hash);
