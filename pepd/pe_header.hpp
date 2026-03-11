@@ -3,16 +3,16 @@
 #include "nmd_assembly.h"
 #include <stdio.h>
 #include "windows.h"
-#include "stream_wrapper.h"
+#include "stream_wrapper.hpp"
 #include <stdlib.h>
-#include "module_list.h"
-#include "export_list.h"
+#include "module_list.hpp"
+#include "export_list.hpp"
 #include <unordered_map>
 #include <unordered_set>
 #include "string.h"
-#include "pe_imports.h"
+#include "pe_imports.hpp"
 #include <functional>
-#include "pe_hash_database.h"
+#include "pe_hash_database.hpp"
 
 using namespace std;
 

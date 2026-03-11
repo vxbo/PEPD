@@ -1,4 +1,4 @@
-#include "pe_imports.h"
+#include "pe_imports.hpp"
 
 void pe_imports::add_fixup(char* library_name, int ordinal, __int64 rva, bool win64)
 {

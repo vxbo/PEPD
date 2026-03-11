@@ -1,9 +1,9 @@
 #pragma once
 
 #include "windows.h"
-#include "simple.h"
-#include "export_list.h"
-#include "utils.h"
+#include "simple.hpp"
+#include "export_list.hpp"
+#include "utils.hpp"
 
 class terminate_monitor_hook
 {

@@ -1,5 +1,4 @@
-#include "export_list.h"
-
+#include "export_list.hpp"
 
 export_entry::export_entry(char* library_name, char* name, WORD ord, unsigned __int64 rva, unsigned __int64 address, bool is64)
 {

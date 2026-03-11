@@ -8,8 +8,8 @@
 #include <sys/types.h>
 #include "dirent.h"
 #include "Shlwapi.h"
-#include "pe_header.h"
-#include "simple.h"
+#include "pe_header.hpp"
+#include "simple.hpp"
 #include <windows.h>          // std::mutex
 
 using namespace std;

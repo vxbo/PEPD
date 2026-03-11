@@ -274,26 +274,26 @@
     <ClCompile Include="terminate_monitor_hook.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="close_watcher.h" />
-    <ClInclude Include="dump_process.h" />
-    <ClInclude Include="export_list.h" />
+    <ClInclude Include="close_watcher.hpp" />
+    <ClInclude Include="dump_process.hpp" />
+    <ClInclude Include="export_list.hpp" />
     <ClInclude Include="hash.h" />
-    <ClInclude Include="module_list.h" />
+    <ClInclude Include="module_list.hpp" />
     <ClInclude Include="nmd_assembly.h" />
-    <ClInclude Include="pe_hash_database.h" />
-    <ClInclude Include="pe_header.h">
+    <ClInclude Include="pe_hash_database.hpp" />
+    <ClInclude Include="pe_header.hpp">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="pe_imports.h" />
+    <ClInclude Include="pe_imports.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="simple.h" />
-    <ClInclude Include="stream_wrapper.h">
+    <ClInclude Include="simple.hpp" />
+    <ClInclude Include="stream_wrapper.hpp">
       <DeploymentContent>true</DeploymentContent>
       <FileType>CppClass</FileType>
     </ClInclude>
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="terminate_monitor_hook.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="terminate_monitor_hook.hpp" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pepd.rc" />

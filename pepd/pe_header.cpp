@@ -1,4 +1,4 @@
-#include "pe_header.h"
+#include "pe_header.hpp"
 
 pe_header::pe_header( const char* filename, PEPD_OPTIONS* options )
 {

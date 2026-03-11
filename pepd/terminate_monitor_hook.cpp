@@ -1,4 +1,4 @@
-#include "terminate_monitor_hook.h"
+#include "terminate_monitor_hook.hpp"
 
 bool terminate_monitor_hook::add_redirect(unsigned __int64 target_address)
 {

@@ -4,14 +4,13 @@
 bool global_flag_verbose = false;
 
 #include "windows.h"
-#include "pe_header.h"
 #include <tlhelp32.h>
 #include <cstdio>
-#include "pe_hash_database.h"
-#include "dump_process.h"
-#include "simple.h"
+#include "pe_hash_database.hpp"
+#include "dump_process.hpp"
+#include "simple.hpp"
 #include <thread>
-#include "close_watcher.h"
+#include "close_watcher.hpp"
 
 #define NMD_ASSEMBLY_IMPLEMENTATION
 #include "nmd_assembly.h"

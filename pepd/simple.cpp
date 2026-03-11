@@ -1,4 +1,4 @@
-#include "simple.h"
+#include "simple.hpp"
 
 size_t process_find(string match_regex, std::vector<process_description*>* result)
 {

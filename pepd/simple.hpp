@@ -4,7 +4,6 @@
 #include <strsafe.h>
 #include <string>
 #include <iostream>
-#include "windows.h"
 #include <tlhelp32.h>
 #include <Psapi.h>
 #include <regex>

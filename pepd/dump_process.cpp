@@ -1,4 +1,4 @@
-#include "dump_process.h"
+#include "dump_process.hpp"
 
 dump_process::dump_process(DWORD pid, pe_hash_database* db, PEPD_OPTIONS* options, bool quieter)
 {

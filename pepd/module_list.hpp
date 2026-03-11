@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include "windows.h"
-#include "simple.h"
+#include "simple.hpp"
 #include <tlhelp32.h>
 #include <unordered_map>
 #include "Psapi.h"

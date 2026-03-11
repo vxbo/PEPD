@@ -2,10 +2,9 @@
 
 #include <stdio.h>
 #include "windows.h"
-#include "simple.h"
+#include "simple.hpp"
 #include <tlhelp32.h>
-#include "module_list.h"
-
+#include "module_list.hpp"
 
 // A stream class that wraps reading from either a file or process memory offset.
 class stream_wrapper

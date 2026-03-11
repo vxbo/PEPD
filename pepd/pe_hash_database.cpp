@@ -1,4 +1,4 @@
-#include "pe_hash_database.h"
+#include "pe_hash_database.hpp"
 
 bool pe_hash_database::_is_mz(FILE* stream)
 {

@@ -1,16 +1,16 @@
 #pragma once
 
 // content
-#include "pe_header.h"
-#include "pe_hash_database.h"
+#include "pe_header.hpp"
+#include "pe_hash_database.hpp"
 #include "windows.h"
 #include <tlhelp32.h>
-#include "simple.h"
-#include "module_list.h"
-#include "export_list.h"
+#include "simple.hpp"
+#include "module_list.hpp"
+#include "export_list.hpp"
 #include "hash.h"
 #include <set>
-#include "terminate_monitor_hook.h"
+#include "terminate_monitor_hook.hpp"
 
 #define PAGE_SIZE 0x1000
 #define CODECHUNK_HEADER_HASH_SIZE 0x200 // First X bytes are CRC32'd of each loose code chunk. Only unique CRC32s are processed deeply.
