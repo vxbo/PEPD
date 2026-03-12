@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdio.h>
-#include "windows.h"
+#include <cstdio>
+#include <Windows.h>
 #include "simple.hpp"
 #include <tlhelp32.h>
 #include <unordered_map>
@@ -11,7 +11,7 @@ extern bool global_flag_verbose;
 
 class module
 {
-	public:
+public:
 	unsigned __int64 start;
 	unsigned __int64 size;
 	char* full_name;
@@ -53,7 +53,7 @@ class module
 
 class module_list
 {
-	
+private:
 	HANDLE _ph;
 
 public:

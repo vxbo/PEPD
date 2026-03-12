@@ -387,16 +387,16 @@ bool dump_process::build_export_list_for_module(export_list& result, std::string
 	bool found = false;
 
 	// Loop through each of these modules, grabbing their exports
-	for (const auto& [base_addr, module_ptr] : modules._modules)
+	for (const auto& [addr, module_ptr] : modules._modules)
 	{
 		if (module_ptr && module_ptr->short_name &&
 			_strcmpi(module_ptr->short_name, library.data()) == 0)
 		{
-			auto header = std::make_unique<pe_header>(_pid, reinterpret_cast<void*>(base_addr), const_cast<module_list*>(&modules), _options);
+			auto header = std::make_unique<pe_header>(_pid, reinterpret_cast<void*>(addr), const_cast<module_list*>(&modules), _options);
 			if (header->process_pe_header() && header->process_sections() && header->process_export_directory())
 			{
 				// Load its exports
-				result.add_export(base_addr, header->get_exports()->find(base_addr));
+				result.add_export(addr, export_entry(library.data(), "", 0, 0, addr, is64));
 				found = true;
 			}
 		}
@@ -427,7 +427,9 @@ bool dump_process::build_export_list()
 				if (header->process_pe_header() && header->process_sections() && header->process_export_directory())
 				{
 					// Load its exports
-					_export_list.add_exports(header->get_exports());
+					export_list* module_exports = header->get_exports();
+					if (module_exports)
+						_export_list.add_exports(*module_exports);
 				}
 			}
 		}

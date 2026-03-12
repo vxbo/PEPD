@@ -1,66 +1,80 @@
 #pragma once
 
-#include "windows.h"
+#include <Windows.h>
+#undef max()
+#undef min()
 #include <memory>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
+#include <string>
+#include <string_view>
+#include <span>
+#include <algorithm>
+#include <limits>
 #include "utils.hpp"
-#include "limits.h"
-
-using namespace std;
 
 class export_entry
 {
 public:
-	char* library_name;
-	char* name;
-	WORD ord;
-	bool is64;
-	unsigned __int64 rva;
-	unsigned __int64 address;
+	std::string library_name;
+    std::string name;
+    WORD ord;
+    bool is64;
+    uint64_t rva;
+    uint64_t address;
 
-	export_entry(char* library_name, char* name, WORD ord, unsigned __int64 rva, unsigned __int64 address, bool is64);
-	export_entry(export_entry* other);
-	~export_entry(void);
+	export_entry(std::string_view library_name, std::string_view name, WORD ord, 
+                 uint64_t rva, uint64_t address, bool is64);
+    export_entry(const export_entry& other);
+    export_entry(export_entry&& other) noexcept = default;
+    export_entry& operator=(const export_entry& other) = delete;
+    export_entry& operator=(export_entry&& other) noexcept = delete;
+    ~export_entry() = default;
 };
-
 
 class export_list
 {
-	unsigned __int64 _min64;
-	unsigned __int64 _max64;
-	unsigned __int32 _min32;
-	unsigned __int32 _max32;
-	unsigned __int32 _bits32;
-	unsigned __int64 _bits64;
+private:
+	uint64_t _min64{std::numeric_limits<uint64_t>::max()};
+    uint64_t _max64{0};
+    uint32_t _min32{std::numeric_limits<uint32_t>::max()};
+    uint32_t _max32{0};
+    uint32_t _bits32{0};
+    uint64_t _bits64{0};
 
-	unordered_map<unsigned __int64, export_entry*> _address_to_exports; // List of export addresses in this export list
-	unordered_set<unsigned __int64> _addresses; // List of export addresses
+	std::unordered_map<uint64_t, std::unique_ptr<export_entry>> _address_to_exports; // List of export addresses in this export list
+	std::unordered_set<uint64_t> _addresses;; // List of export addresses
+
 public:
-	
+	export_list() = default;
 
-	export_list();
+    ~export_list() = default;
+	export_list(const export_list&) = delete;
+    export_list& operator=(const export_list&) = delete;
+	export_list(export_list&&) noexcept = default;
+    export_list& operator=(export_list&&) noexcept = default;
 	
-	bool add_exports(unsigned char* image, SIZE_T image_size, unsigned __int64 image_base, IMAGE_EXPORT_DIRECTORY* header_export_directory, bool is64);
-	bool add_exports(export_list* other);
-	void add_export(unsigned __int64 address, export_entry entry);
+	bool add_exports(std::span<const std::byte> image, uint64_t image_base, 
+                     const IMAGE_EXPORT_DIRECTORY* export_directory, bool is64);
+    bool add_exports(const export_list& other);
+    void add_export(uint64_t address, const export_entry& entry);
 
 	// Find export addresses in a process
-	unsigned __int64 find_export(const char* library, const char* name, bool is64);
+	[[nodiscard]] uint64_t find_export(std::string_view library, 
+                                       std::string_view name, bool is64) const;
+    [[nodiscard]] bool contains(uint64_t address) const;
+    [[nodiscard]] bool contains(uint32_t address) const;
 
-	// Functions to get quick filter values before doing a lookup
-	bool contains(unsigned __int64 address);
-	bool contains(unsigned __int32 address);
-	export_entry find(unsigned __int64 address);
-	unsigned __int64 get_min64() { return _min64; };
-	unsigned __int64 get_max64() { return _max64; };
-	unsigned __int32 get_min32() { return _min32; };
-	unsigned __int32 get_max32() { return _max32; };
-	unsigned __int32 get_nobits32() { return ~_bits32; };
-	unsigned __int64 get_nobits64() { return ~_bits64; };
+    // Functions to get quick filter values before doing a lookup
+    [[nodiscard]] const export_entry* find(uint64_t address) const;
 
-	~export_list(void);
+	[[nodiscard]] uint64_t get_min64() const noexcept { return _min64; }
+    [[nodiscard]] uint64_t get_max64() const noexcept { return _max64; }
+    [[nodiscard]] uint32_t get_min32() const noexcept { return _min32; }
+    [[nodiscard]] uint32_t get_max32() const noexcept { return _max32; }
+    [[nodiscard]] uint32_t get_nobits32() const noexcept { return ~_bits32; }
+    [[nodiscard]] uint64_t get_nobits64() const noexcept { return ~_bits64; }
 };

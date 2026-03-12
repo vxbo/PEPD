@@ -590,7 +590,7 @@ IMPORT_SUMMARY pe_header::get_imports_information( export_list* exports, __int64
 			{
 				if (exports->contains(cand32))
 				{
-					export_entry entry = exports->find(cand32);
+					const export_entry* entry = exports->find(cand32);
 
 					// Found an import reference
 					unordered_set<unsigned __int64>::const_iterator gotImportAddress = import_addresses.find(cand32);
@@ -602,15 +602,15 @@ IMPORT_SUMMARY pe_header::get_imports_information( export_list* exports, __int64
 						result.COUNT_UNIQUE_IMPORT_ADDRESSES++;
 
 						// Add this imported function hash
-						if (entry.name != NULL)
+						if (entry->name.empty())
 						{
-							hash_generic = hash_generic ^ hasher(string(entry.name));
-							hash_specific = hash_specific ^ hasher(string(entry.name));
+							hash_generic = hash_generic ^ hasher(string(entry->name));
+							hash_specific = hash_specific ^ hasher(string(entry->name));
 						}
-						if (entry.library_name != NULL)
+						if (entry->library_name.empty())
 						{
-							hash_generic = hash_generic ^ (hasher(string(entry.library_name)) << 1);
-							hash_specific = hash_specific ^ (hasher(string(entry.library_name)) << 1);
+							hash_generic = hash_generic ^ (hasher(string(entry->library_name)) << 1);
+							hash_specific = hash_specific ^ (hasher(string(entry->library_name)) << 1);
 						}
 						hash_generic = _rotl(hash_generic, 0x05);
 						hash_specific = hash_specific ^ offset;
@@ -625,7 +625,7 @@ IMPORT_SUMMARY pe_header::get_imports_information( export_list* exports, __int64
 			{
 				if (exports->contains(cand64))
 				{
-					export_entry entry = exports->find(cand64);
+					const export_entry* entry = exports->find(cand64);
 
 					// Found an import reference
 					unordered_set<unsigned __int64>::const_iterator gotImportAddress = import_addresses.find(cand64);
@@ -637,15 +637,15 @@ IMPORT_SUMMARY pe_header::get_imports_information( export_list* exports, __int64
 						result.COUNT_UNIQUE_IMPORT_ADDRESSES++;
 
 						// Add this imported function hash
-						if (entry.name != NULL)
+						if (entry->name.empty())
 						{
-							hash_generic = hash_generic ^ hasher(string(entry.name));
-							hash_specific = hash_specific ^ hasher(string(entry.name));
+							hash_generic = hash_generic ^ hasher(string(entry->name));
+							hash_specific = hash_specific ^ hasher(string(entry->name));
 						}
-						if (entry.library_name != NULL)
+						if (entry->library_name.empty())
 						{
-							hash_generic = hash_generic ^ (hasher(string(entry.library_name)) << 1);
-							hash_specific = hash_specific ^ (hasher(string(entry.library_name)) << 1);
+							hash_generic = hash_generic ^ (hasher(string(entry->library_name)) << 1);
+							hash_specific = hash_specific ^ (hasher(string(entry->library_name)) << 1);
 						}
 						hash_generic = _rotl(hash_generic, 0x05);
 						hash_specific = hash_specific ^ offset;
@@ -1384,13 +1384,13 @@ bool pe_header::process_disk_image( export_list* exports, pe_hash_database* hash
 
 					if ( cand_last != cand && exports->contains( cand ) )
 					{
-						export_entry entry = exports->find(cand);
+						const export_entry* entry = exports->find(cand);
 
 						// Add this to be reconstructed as an import
-						if (entry.name != NULL)
-							peimp->add_fixup(entry.library_name, entry.name, offset, this->_parsed_pe_64);
+						if (entry->name.empty())
+							peimp->add_fixup(entry->library_name.c_str(), entry->name.c_str(), offset, this->_parsed_pe_64);
 						else
-							peimp->add_fixup(entry.library_name, entry.ord, offset, this->_parsed_pe_64);
+							peimp->add_fixup(entry->library_name.c_str(), entry->ord, offset, this->_parsed_pe_64);
 						count++;
 					}
 					else
@@ -1647,13 +1647,13 @@ bool pe_header::process_disk_image( export_list* exports, pe_hash_database* hash
 
 					if (cand_last != cand && exports->contains(cand))
 					{
-						export_entry entry = exports->find(cand);
+						const export_entry* entry = exports->find(cand);
 
 						// Add this to be reconstructed as an import
-						if (entry.name != NULL)
-							peimp->add_fixup(entry.library_name, entry.name, offset, this->_parsed_pe_64);
+						if (entry->name.empty())
+							peimp->add_fixup(entry->library_name.c_str(), entry->name.c_str(), offset, this->_parsed_pe_64);
 						else
-							peimp->add_fixup(entry.library_name, entry.ord, offset, this->_parsed_pe_64);
+							peimp->add_fixup(entry->library_name.c_str(), entry->ord, offset, this->_parsed_pe_64);
 						count++;
 					}
 					else
@@ -2003,8 +2003,8 @@ bool pe_header::process_export_directory( )
 			
 			// Parse this export directory
 			_export_list = new export_list();
-			_export_list->add_exports( _image, _image_size, (__int64) _original_base, _header_export_directory, this->_parsed_pe_64);
-			
+			_export_list->add_exports( _image, _image_size, _original_base, _header_export_directory, this->_parsed_pe_64);
+
 			return true;
 		}
 	}

@@ -1,103 +1,68 @@
 #include "export_list.hpp"
+#include <print>
 
-export_entry::export_entry(char* library_name, char* name, WORD ord, unsigned __int64 rva, unsigned __int64 address, bool is64)
+// Safe read function
+template<typename T>
+[[nodiscard]] static bool sread(std::span<const std::byte> image, uintptr_t offset, T& value)
 {
-	// Copy the strings locally, knowing the function might not have a name but has to have a library name
-	if (library_name != NULL)
-	{
-		this->library_name = new char[strlen(library_name) + 1];
-		strcpy(this->library_name, library_name);
-	}
-	else
-	{
-		this->library_name = NULL;
-	}
-
-	if( name != NULL )
-	{
-		this->name = new char[strlen(name) + 1];
-		strcpy( this->name, name );
-	}
-	else
-	{
-		this->name = NULL;
-	}
-
-	this->is64 = is64;
-	this->ord = ord;
-	this->rva = rva;
-	this->address = address;
+	if (offset + sizeof(T) > image.size())
+		return false;
+	std::memcpy(&value, image.data() + offset, sizeof(T));
+	return true;
 }
 
-export_entry::export_entry(export_entry* other)
+// Get string from image function
+[[nodiscard]] static std::string sgets(std::span<const std::byte> image, uintptr_t offset,
+									   size_t max_length = 511)
 {
-	// Copy the strings locally, knowing the function might not have a name but has to have a library name
-	if (other->library_name != NULL)
-	{
-		this->library_name = new char[strlen(other->library_name) + 1];
-		strcpy(this->library_name, other->library_name);
-	}
-	else
-	{
-		this->library_name = NULL;
-	}
-	
-	if( other->name != NULL )
-	{
-		this->name = new char[strlen(other->name) + 1];
-		strcpy( this->name, other->name );
-	}
-	else
-	{
-		this->name = NULL;
-	}
+	if (offset >= image.size())
+		return {};
 
-	this->is64 = other->is64;
-	this->ord = other->ord;
-	this->rva = other->rva;
-	this->address = other->address;
+	const auto* start = reinterpret_cast<const char*>(image.data() + offset);
+	const auto* end = std::find(start, reinterpret_cast<const char*>(image.data() + image.size()), '\0');
+	auto length = std::min(static_cast<size_t>(end - start), max_length);
+
+	return std::string(start, length);
 }
 
-export_entry::~export_entry(void)
+export_entry::export_entry(std::string_view library_name, std::string_view name, WORD ord,
+                          uint64_t rva, uint64_t address, bool is64)
+    : library_name(library_name)
+    , name(name)
+    , ord(ord)
+    , is64(is64)
+    , rva(rva)
+    , address(address)
 {
-	if( library_name != NULL )
-		delete [] library_name;
-	if( name != NULL )
-		delete [] name;
 }
 
-export_list::export_list()
+export_entry::export_entry(const export_entry& other)
+    : library_name(other.library_name)
+    , name(other.name)
+    , ord(other.ord)
+    , is64(other.is64)
+    , rva(other.rva)
+    , address(other.address)
 {
-	_min64 = _UI64_MAX;
-	_max64 = UINT_MAX;
-	_min32 = UINT_MAX;
-	_max32 = 0;
-	_bits32 = 0;
-	_bits64 = 0;
 }
 
-bool export_list::contains(unsigned __int64 address)
+bool export_list::contains(uint64_t address) const
 {
 	// Look up a 64-bit value
-	if ( address <= UINT_MAX )
-		return contains((unsigned __int32)address);
+	if ( address <= std::numeric_limits<uint32_t>::max() )
+		return contains(static_cast<uint32_t>(address));
 	
-	if (address > _max64 || address < _min64 || (address & ~_bits64) > 0)
+	if (address > _max64 || address < _min64 || (address & ~_bits64) != 0)
 	{
 		// We know there is no match by this quick filtering. This improves performance hugely.
 		return false;
 	}
 
 	// Lookup the address
-	unordered_set<unsigned __int64>::const_iterator got = _addresses.find(address);
-	if (got != _addresses.end())
-	{
-		return true;
-	}
-	return false;
+	return _addresses.contains(address);
 }
 
-bool export_list::contains(unsigned __int32 address)
+bool export_list::contains(uint32_t address) const
 {
 	// Look up a 32-bit value
 	if (address > _max32 || address < _min32 || (address & ~_bits32) > 0)
@@ -107,159 +72,134 @@ bool export_list::contains(unsigned __int32 address)
 	}
 
 	// Lookup the address
-	unordered_set<unsigned __int64>::const_iterator got = _addresses.find(address);
-	if (got != _addresses.end())
-	{
-		return true;
-	}
-	return false;
+	return _addresses.contains(address);
 }
 
-unsigned __int64 export_list::find_export(const char* library, const char* name, bool is64)
+uint64_t export_list::find_export(std::string_view library, std::string_view name, bool is64) const
 {
 	// Find the specified procedure in the corresponding library. Limit it to the specific 32-bit or 64-bit version of the library.
-	for (unordered_map<unsigned __int64, export_entry*>::iterator it = _address_to_exports.begin(); it != _address_to_exports.end(); ++it)
+	for (const auto& [addr, entry] : _address_to_exports)
 	{
-		//if( strcmp(it->second->library_name,"kernel32.dll") == 0 )
-		//	printf("%s::%s\n", it->second->library_name, it->second->name);
-		if (it->second->is64 == is64 && (library == NULL || strcmpi(library, it->second->library_name) == 0 ) && strcmpi(name, it->second->name) == 0)
+		if (entry->is64 == is64 &&
+			(library.empty() || _stricmp(library.data(), entry->library_name.c_str()) == 0) &&
+			_stricmp(name.data(), entry->name.c_str()) == 0)
 		{
-			// Found a match
-			return it->second->address;
+			// Found match
+			return entry->address;
 		}
 	}
 
 	// No match
-	return NULL;
+	return 0;
 }
 
-export_entry export_list::find(unsigned __int64 address)
+const export_entry* export_list::find(uint64_t address) const
 {
 	// Lookup the address
-	unordered_map<unsigned __int64, export_entry*>::const_iterator got = _address_to_exports.find(address);
-	if (got != _address_to_exports.end())
-	{
-		return got->second;
-	}
-	return NULL;
+	auto it = _address_to_exports.find(address);
+	return (it != _address_to_exports.end()) ? it->second.get() : nullptr;
 }
 
-void export_list::add_export(unsigned __int64 address, export_entry entry)
+void export_list::add_export(uint64_t address, const export_entry& entry)
 {
 	// Register this export address for quick lookups later
-	if (_address_to_exports.count(address) == 0)
+	if (!_address_to_exports.contains(address))
 	{
-		_address_to_exports.insert(std::pair<unsigned __int64, export_entry*>(address, new export_entry(&entry)));
+		auto new_entry = std::make_unique<export_entry>(entry);
+		_address_to_exports.emplace(address, std::move(new_entry));
 
-		if (_addresses.count(address) == 0)
+		if (_addresses.insert(address).second)
 		{
-			_addresses.insert(address);
-
 			// Update our quick-lookup values
-			if ( address > UINT_MAX )
+			if ( address > std::numeric_limits<uint32_t>::max() )
 			{
 				// 64bit value
-				if (address > _max64)
-					_max64 = address;
-				if (address < _min64)
-					_min64 = address;
-				_bits64 = _bits64 | address;
+				_max64 = std::max(_max64, address);
+				_min64 = std::min(_max64, address);
+				_bits64 |= address;
 			}
 			else
 			{
 				// 32bit value
-				if (address > _max32)
-					_max32 = address;
-				if (address < _min32)
-					_min32 = address;
-				_bits32 = _bits32 | address;
+				_max32 = std::max(_max32, static_cast<uint32_t>(address));
+				_min32 = std::min(_min32, static_cast<uint32_t>(address));
+				_bits32 |= static_cast<uint32_t>(address);
 			}
 		}
 	}
 }
 
-bool export_list::add_exports(export_list* other)
+bool export_list::add_exports(const export_list& other)
 {
 	// Merge the exports from the other list with the current export list
-	for (unordered_map<unsigned __int64,export_entry*>::iterator it = other->_address_to_exports.begin();
-        it != other->_address_to_exports.end(); ++it) 
-	{
-		add_export(it->first, it->second);
-	}
+	for (const auto& [addr, entry] : other._address_to_exports)
+		add_export(addr, *entry);
 	return true;
 }
 
-
-bool export_list::add_exports(unsigned char* image, SIZE_T image_size, unsigned __int64 image_base, IMAGE_EXPORT_DIRECTORY* export_directory, bool is64)
+bool export_list::add_exports(std::span<const std::byte> image, std::uint64_t image_base,
+                              const IMAGE_EXPORT_DIRECTORY* export_directory, bool is64)
 {
-	if( export_directory->NumberOfFunctions > 0 && export_directory->AddressOfNameOrdinals != 0 )
+	if (!export_directory || export_directory->NumberOfFunctions = 0 ||
+		export_directory->AddressOfNameOrdinals == 0)
 	{
-		char* library_name = (char*) ((__int64) export_directory->Name + image);
-		if( !test_read(image, image_size, (unsigned char*) library_name, 0x1ff) || strlen(library_name) == 0 )
-		{
-			// Library name is invalid, no point in continuing to parse since we need this name to reconstruct any imports anyway
-			//throw std::invalid_argument( printf("Invalid library export directory module name. Unable to add exports to table for import reconstruction. Library base 0x%llX.", (unsigned long long int) image_base ) );
-			fprintf( stderr, "WARNING: Invalid library export directory module name. Unable to add exports to table for import reconstruction. Library base 0x%llX.\n",
-											(unsigned long long int) image_base );
-			return false;
-		}
-		
-		// Parse the export directory
-		for (int i = 0; i < export_directory->NumberOfNames; i++)
-		{
-			// Load the ordinal
-			if( test_read(image, image_size, image + export_directory->AddressOfNameOrdinals + i*2, 2) )
-			{
-				DWORD ordinal_relative = *(WORD*)(export_directory->AddressOfNameOrdinals + i*2 + image);
-				DWORD ordinal = export_directory->Base + ordinal_relative;
-				
-				// Load the name, there doesn't have to be one
-				char* name = NULL;
-				if (i < export_directory->NumberOfNames)
-				{
-					if( test_read(image, image_size, image + export_directory->AddressOfNames + i*4, 4) )
-					{
-						DWORD name_offset = *((DWORD*) (image + export_directory->AddressOfNames + i*4));
-						
-						if( test_read(image, image_size, image + name_offset, 0x4f) )
-						{
-							name = (char*) ( name_offset + image );
-						}
-					}
-				}
-				
+		return false;
+	}
 
-				// Load the rva
-				if( test_read(image, image_size, image + export_directory->AddressOfFunctions + ordinal_relative*4, 4) )
-				{
-					__int64 rva = *((DWORD*)(image + export_directory->AddressOfFunctions + ordinal_relative * 4));
+	// Get library name
+	std::string library_name;
+	if (export_directory->Name < image.size())
+		library_name = sgets(image, export_directory->Name);
 
-					// Don't consider rva's of multiple of 0x1000 to prevent making mistakes in dump repairs
-					if( rva % 0x1000 != 0 )
-					{
-						__int64 address = image_base + rva;
-						
-						// Add this export
-						auto new_entry = std::make_unique<export_entry>( library_name, name, ordinal, rva, address, is64);
-						add_export(address, new_entry.get());
-					}
-				}
-				
-			}
+	if (library_name.empty())
+	{
+		// Library name is invalid, no point in continuing
+		std::println(stderr,
+			"WARNING: Invalid library export directory module name. "
+            "Unable to add exports to table for import reconstruction. "
+            "Library base 0x{:X}.", image_base);
+		return false;
+	}
+
+	// Parse the export directory
+	for (DWORD i = 0; i < export_directory->NumberOfNames; ++i)
+	{
+		// Load the ordinal
+		WORD ordinal_relative = 0;
+		uintptr_t ord_offset = export_directory->AddressOfNameOrdinals + i*sizeof(WORD);
+		if (!sread(image, ord_offset, ordinal_relative))
+			continue;
+
+		DWORD ordinal = export_directory->Name + ordinal_relative;
+
+		// Load the name RVA
+		DWORD name_rva = 0;
+		uintptr_t name_offset = export_directory->AddressOfNames + i*sizeof(DWORD);
+		if (!sread(image, name_offset, name_rva))
+			continue;
+
+		// Get the name string
+		std::string func_name;
+		if (name_rva < image.size())
+			func_name = sgets(image, name_rva);
+
+		// Load the function RVA
+		DWORD func_rva = 0;
+		uintptr_t func_offset = export_directory->AddressOfFunctions + ordinal_relative * sizeof(DWORD);
+		if (!sread(image, func_offset, func_rva))
+			continue;
+
+		// Don't consider RVAs that are multiples of 0x1000 to prevent mistakes
+		if (func_rva % 0x1000 != 0)
+		{
+			uint64_t address = image_base + func_rva;
+
+			// Add this export
+			add_export(address, export_entry(library_name, func_name,
+											 static_cast<WORD>(ordinal),
+											 func_rva, address, is64));
 		}
 	}
+
 	return true;
-	
-	
-}
-
-export_list::~export_list(void)
-{
-	// Clean up the export list
-	for (unordered_map<unsigned __int64,export_entry*>::iterator it = _address_to_exports.begin();
-        it != _address_to_exports.end(); ++it) 
-	{
-		delete it->second;
-	}
-	_address_to_exports.clear();
 }

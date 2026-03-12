@@ -12,16 +12,14 @@
 #include <set>
 #include "terminate_monitor_hook.hpp"
 
-constexpr std::size_t PAGE_SIZE = 0x1000;
-constexpr std::size_t CODECHUNK_HEADER_HASH_SIZE = 0x200; // First X bytes are CRC32'd of each loose code chunk. Only unique CRC32s are processed deeply.
-constexpr std::size_t CODECHUNK_NEW_HASH_LIMIT = 500; // At most X code chunks processed deeply per process
-
-using namespace std;
+constexpr size_t PAGE_SIZE = 0x1000;
+constexpr size_t CODECHUNK_HEADER_HASH_SIZE = 0x200; // First X bytes are CRC32'd of each loose code chunk. Only unique CRC32s are processed deeply.
+constexpr size_t CODECHUNK_NEW_HASH_LIMIT = 500; // At most X code chunks processed deeply per process
 
 struct MBI_BASIC_INFO
 {
-	std::uintptr_t base{};
-	std::uintptr_t end{};
+	uintptr_t base{};
+	uintptr_t end{};
 	DWORD protect{};
 	bool valid{};
 	bool executable{};

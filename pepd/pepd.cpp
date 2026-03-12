@@ -1,4 +1,4 @@
-// pd.cpp : Defines the entry point for the console application.
+﻿// pd.cpp : Defines the entry point for the console application.
 //
 
 bool global_flag_verbose = false;
@@ -10,12 +10,29 @@ bool global_flag_verbose = false;
 #include "dump_process.hpp"
 #include "simple.hpp"
 #include <thread>
+#include <print>
 #include "close_watcher.hpp"
 
 #define NMD_ASSEMBLY_IMPLEMENTATION
 #include "nmd_assembly.h"
 #include <queue>
 
+const static void prn_banner()
+{
+	// Print cool banner
+	std::println(R"(
+	 ███████████  ██████████ ███████████  ██████████  
+	░░███░░░░░███░░███░░░░░█░░███░░░░░███░░███░░░░███ 
+	 ░███    ░███ ░███  █ ░  ░███    ░███ ░███   ░░███
+	 ░██████████  ░██████    ░██████████  ░███    ░███
+	 ░███░░░░░░   ░███░░█    ░███░░░░░░   ░███    ░███
+	 ░███         ░███ ░   █ ░███         ░███    ███ 
+	 █████        ██████████ █████        ██████████  
+	░░░░░        ░░░░░░░░░░ ░░░░░        ░░░░░░░░░░   
+                                                  
+                                                  
+                                                  )");
+}
 
 BOOL is_win64()
 {
@@ -237,7 +254,7 @@ void dump_process_worker(std::queue<PROCESSENTRY32>* work_queue, pe_hash_databas
 		dumper->dump_all();
 
 		// Exclude these hashes from the next dumps
-		dumper->get_all_hashes(&new_hashes, NULL, NULL);
+		dumper->get_all_hashes(&new_hashes, 0, 0);
 		db->add_hashes(new_hashes);
 		new_hashes.clear();
 
@@ -816,10 +833,11 @@ else
 
 	if( flagHeader )
 	{
-		printf_s("Process Dump v2.3 (DEV)\n");
-		printf_s("  Copyright (c) 2026, vxbo\n");
-		printf_s("  Copyright (c) 2017, Geoff McDonald\n");
-		printf_s("  https://github.com/vxbo/PEPD\n\n");
+		prn_banner();
+		printf_s("\tProcess Dump v2.3 (DEV)\n");
+		printf_s("  \tCopyright (c) 2026, vxbo\n");
+		printf_s("  \tCopyright (c) 2017, Geoff McDonald\n");
+		printf_s("  \thttps://github.com/vxbo/PEPD\n\n");
 	}
 
 	if( flagHelp )

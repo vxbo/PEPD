@@ -1,15 +1,14 @@
 #include "pe_imports.hpp"
 
-void pe_imports::add_fixup(char* library_name, int ordinal, __int64 rva, bool win64)
+void pe_imports::add_fixup(const char* library_name, WORD ordinal, __int64 rva, bool win64)
 {
 	this->_libraries.push_back(new import_library(library_name, ordinal, rva, win64));
 }
 
-void pe_imports::add_fixup(char* library_name, char* proc_name, __int64 rva, bool win64)
+void pe_imports::add_fixup(const char* library_name, const char* proc_name, __int64 rva, bool win64)
 {
 	this->_libraries.push_back(new import_library(library_name, proc_name, rva, win64));
 }
-
 
 void pe_imports::get_table_size(__int64 &descriptor_size, __int64 &extra_size)
 {
@@ -97,7 +96,7 @@ import_library::import_library(IMAGE_IMPORT_DESCRIPTOR* descriptor, bool win64)
 	_thunk_entry = NULL;
 }
 
-import_library::import_library(char* library_name, int ordinal, __int64 rva, bool win64)
+import_library::import_library(const char* library_name, WORD ordinal, __int64 rva, bool win64)
 {
 	// Create an import library to fixup a specific rva to the ordinal
 	_descriptor = new IMAGE_IMPORT_DESCRIPTOR();
@@ -109,8 +108,7 @@ import_library::import_library(char* library_name, int ordinal, __int64 rva, boo
 	_import_by_name = NULL;
 	_thunk_entry = new IMAGE_THUNK_DATA64();
 
-	_library_name = new char[strlen(library_name)+1];
-	strcpy(_library_name, library_name);
+	_library_name = library_name;
 	
 	// Ordinal import
 	if( win64 )
@@ -119,7 +117,7 @@ import_library::import_library(char* library_name, int ordinal, __int64 rva, boo
 		_thunk_entry->u1.Ordinal = IMAGE_ORDINAL_FLAG32 | (ordinal & 0xffff);
 }
 
-import_library::import_library(char* library_name, char* proc_name, __int64 rva, bool win64)
+import_library::import_library(const char* library_name, const char* proc_name, __int64 rva, bool win64)
 {
 	// Create an import library to fixup a specific rva to the ordinal
 	_descriptor = new IMAGE_IMPORT_DESCRIPTOR();
@@ -130,8 +128,7 @@ import_library::import_library(char* library_name, char* proc_name, __int64 rva,
 	_descriptor->FirstThunk = rva; // PE Loader with patchup address at rva to become the address of the import, awesome!
 	_thunk_entry = new IMAGE_THUNK_DATA64();
 
-	_library_name = new char[strlen(library_name)+1];
-	strcpy(_library_name, library_name);
+	_library_name = library_name;
 	
 	// Name import
 	_thunk_entry->u1.AddressOfData = NULL; // Replace with rva to import_by_name
